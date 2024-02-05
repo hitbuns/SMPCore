@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.example</groupId>
-    <artifactId>GradedSystem</artifactId>
+    <artifactId>SMPCore</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
@@ -197,7 +197,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.SurvivalPlus.Main</mainClass>
+                            <mainClass>com.SMPCore.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
