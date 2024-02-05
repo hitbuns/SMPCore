@@ -171,7 +171,7 @@ public class RegionFlagEditor extends AbstractModifiableListMenu<Flag> implement
 
     @Override
     public void onOpen(Player player) {
-        update();
+        if (ready) update();
     }
 
     @Override

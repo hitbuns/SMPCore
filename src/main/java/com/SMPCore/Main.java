@@ -1,6 +1,9 @@
 package com.SMPCore;
 
 import com.SMPCore.Utilities.FlagRegistryConfig;
+import com.SMPCore.Utilities.WorldGuardAPI;
+import com.SMPCore.commands.CmdClaim;
+import com.SMPCore.listeners.EventListener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Main extends JavaPlugin {
@@ -13,6 +16,8 @@ public class Main extends JavaPlugin {
 
         Instance = this;
 
+        new WorldGuardAPI();
+
 
         FlagRegistryConfig.register(this);
 
@@ -22,11 +27,11 @@ public class Main extends JavaPlugin {
     }
 
     void registerCommands() {
-
+        getCommand("protectarea").setExecutor(new CmdClaim());
     }
 
     void registerListeners() {
-
+        getServer().getPluginManager().registerEvents(new EventListener(),this);
     }
 
 }

@@ -4,6 +4,8 @@ import com.MenuAPI.ItemAdder;
 import com.MenuAPI.Utilities.DescriptionBuilder;
 import com.MenuAPI.Utilities.ItemBuilder;
 import com.MenuAPI.Utils;
+import com.SMPCore.Utilities.WorldGuardAPI;
+import com.SMPCore.gui.RegionFlagEditor;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -132,9 +134,11 @@ public class CmdClaim implements CommandExecutor, TabCompleter {
 
 
             }
-            case "info" -> {
-
-            }
+            case "info" -> WorldGuardAPI.getRegionsInLocation(player.getLocation(), protectedRegion -> protectedRegion.getId()
+                    .startsWith("protectarea_")).stream().findFirst().ifPresentOrElse(protectedRegion -> new RegionFlagEditor(player,!protectedRegion.getOwners()
+                            .contains(player.getUniqueId()),protectedRegion,null).open(player),() -> {
+                        player.sendMessage(Utils.color("&4[!] &cThere are no protectarea claim in this area!"));
+            });
             case "menu" -> {
 
             }

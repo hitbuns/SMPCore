@@ -7,3 +7,11 @@ depend:
   - MenuAPI
   - WorldGuard
   - WorldEdit
+
+
+commands:
+  protectarea:
+    aliases:
+      - pa
+      - areaprotect
+      - ap
