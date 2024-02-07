@@ -2,12 +2,11 @@ package com.SMPCore.gui;
 
 import com.MenuAPI.GUISystem.AbstractModifiableListMenu;
 import com.MenuAPI.GUISystem.GUIClickRunnable;
-import com.MenuAPI.GUISystem.iPage;
 import com.MenuAPI.Utilities.DecorationUtils;
 import com.MenuAPI.Utilities.DescriptionBuilder;
 import com.MenuAPI.Utilities.ItemBuilder;
+import com.MenuAPI.Utils;
 import com.sk89q.worldguard.protection.flags.RegionGroup;
-import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Color;
@@ -85,8 +84,20 @@ public class StateFlagGroupEditor extends AbstractModifiableListMenu<RegionGroup
     public GUIClickRunnable onGUIClick() {
         return guiClickEvent -> {
 
+
+            ItemStack itemStack1 = guiClickEvent.getCurrentItem();
+
+            if (Utils.isNullorAir(itemStack1)) return;
+
+            NBTItem nbtItem = new NBTItem(itemStack1);
+
+            if (!nbtItem.hasKey("clickValue")) return;
+
+
+            RegionGroup regionGroup = regionGroups[nbtItem.getInteger("clickValue")];
+
             stateFlagEditor.regionFlagEditor.protectedRegion.setFlag(stateFlagEditor.stateFlag, state);
-            stateFlagEditor.regionFlagEditor.protectedRegion.setFlag(stateFlagEditor.stateFlag.getRegionGroupFlag(), RegionGroup.NON_MEMBERS);
+            stateFlagEditor.regionFlagEditor.protectedRegion.setFlag(stateFlagEditor.stateFlag.getRegionGroupFlag(),regionGroup);
 
             openPage(stateFlagEditor.regionFlagEditor);
 
