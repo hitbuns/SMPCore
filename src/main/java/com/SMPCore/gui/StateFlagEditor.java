@@ -7,6 +7,7 @@ import com.MenuAPI.Utilities.DecorationUtils;
 import com.MenuAPI.Utilities.DescriptionBuilder;
 import com.MenuAPI.Utilities.ItemBuilder;
 import com.MenuAPI.Utils;
+import com.sk89q.worldguard.protection.flags.RegionGroup;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Material;
@@ -45,11 +46,10 @@ public class StateFlagEditor extends AbstractClickableGUI {
 
         if (state == null) state = stateFlag.getDefault();
 
-        assert state != null;
-
         getInventory().setItem(10,new ItemBuilder(Material.ITEM_FRAME)
                 .setDisplayName("&e"+stateFlag.getName()).setLore(DescriptionBuilder.init()
-                                .addLore("&7Value: &a"+state.name()).build())
+                                .addLore("&7Value: &a"+(state != null ? state.name() :
+                                        "<NOT SET>")).build())
                 .build(false));
     }
 
@@ -64,13 +64,14 @@ public class StateFlagEditor extends AbstractClickableGUI {
 
             if (nbtItem.hasKey("clickValue")) {
 
-                regionFlagEditor.protectedRegion.setFlag(stateFlag, StateFlag.State.valueOf(nbtItem.getString("clickValue").toUpperCase()));
-                update();
+
+                openPage(new StateFlagGroupEditor(getPlayer(),this,StateFlag.State.valueOf(nbtItem.getString("clickValue").toUpperCase())));
 
             }
 
 
         },false));
+        setDefaultAction("default");
     }
 
     @Override

@@ -67,6 +67,7 @@ public class BooleanFlagEditor extends AbstractClickableGUI {
 
 
         },false));
+        setDefaultAction("default");
     }
 
     @Override

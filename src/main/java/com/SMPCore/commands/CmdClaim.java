@@ -101,8 +101,10 @@ public class CmdClaim implements CommandExecutor, TabCompleter {
                 long volume = cuboidRegion.getVolume(),total = regionManager.getRegions().values().stream().filter(protectedRegion -> protectedRegion.getOwners()
                         .contains(player.getUniqueId())).mapToLong(ProtectedRegion::volume).sum() + volume;
 
-                if (total >= 5000) {
-                    player.sendMessage(Utils.color("&4[!] &eYou cannot claim this region as it would exceed 5000 block volume"));
+                System.out.println("VOLUME>> "+volume+":: TOTAL>> "+total);
+
+                if (total >= 500000) {
+                    player.sendMessage(Utils.color("&4[!] &eYou cannot claim this region as it would exceed 500000 block volume"));
                     return true;
                 }
 
@@ -114,7 +116,7 @@ public class CmdClaim implements CommandExecutor, TabCompleter {
                 if (regionManager.getRegions().entrySet().stream()
                         .anyMatch(stringProtectedRegionEntry -> !(stringProtectedRegionEntry.getKey().equalsIgnoreCase("__global__"))
                         && !stringProtectedRegionEntry.getValue().getIntersectingRegions(list).isEmpty())) {
-
+                    player.sendMessage(Utils.color("&4[!] &eYou cannot claim this area as there is already an existing admin region or protect area in the selected region"));
                     return true;
                 }
 
@@ -136,9 +138,7 @@ public class CmdClaim implements CommandExecutor, TabCompleter {
             }
             case "info" -> WorldGuardAPI.getRegionsInLocation(player.getLocation(), protectedRegion -> protectedRegion.getId()
                     .startsWith("protectarea_")).stream().findFirst().ifPresentOrElse(protectedRegion -> new RegionFlagEditor(player,!protectedRegion.getOwners()
-                            .contains(player.getUniqueId()),protectedRegion,null).open(player),() -> {
-                        player.sendMessage(Utils.color("&4[!] &cThere are no protectarea claim in this area!"));
-            });
+                            .contains(player.getUniqueId()),protectedRegion,null).open(player),() -> player.sendMessage(Utils.color("&4[!] &cThere are no protectarea claim in this area!")));
             case "menu" -> {
 
             }

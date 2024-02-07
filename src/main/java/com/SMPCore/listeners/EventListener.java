@@ -69,7 +69,17 @@ public class EventListener implements Listener {
     @EventHandler
     public void onDropWand(PlayerDropItemEvent playerDropItemEvent) {
 
+        ItemStack itemStack = playerDropItemEvent.getItemDrop().getItemStack();
 
+        if (Utils.isNullorAir(itemStack)) return;
+
+        NBTItem nbtItem = new NBTItem(itemStack);
+        if (nbtItem.hasKey("claimTool") && nbtItem.getBoolean("claimTool")) {
+
+            playerDropItemEvent.getItemDrop().setPickupDelay(Integer.MAX_VALUE);
+            playerDropItemEvent.getItemDrop().remove();
+
+        }
 
     }
 

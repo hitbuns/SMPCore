@@ -50,7 +50,7 @@ public class RegionFlagEditor extends AbstractModifiableListMenu<Flag> implement
             return;
         }
 
-        init(9,17,31,10,11,12,13,14,15,16,19,20,21,22,23,24,25,26);
+        init(9,17,31,10,11,12,13,14,15,16,19,20,21,22,23,24,25);
 
     }
 
@@ -65,11 +65,9 @@ public class RegionFlagEditor extends AbstractModifiableListMenu<Flag> implement
 
             if (state == null) state = stateFlag.getDefault();
 
-            assert state != null;
-
             ItemStack itemStack1 = new ItemBuilder(Material.ITEM_FRAME)
                     .setDisplayName("&9"+flag.getName()).setLore(DescriptionBuilder.init()
-                            .addLore("&7Value: &a"+state.name(),"","&e>| Click to edit value").build())
+                            .addLore("&7Value: &a"+(state == null ? "<NOT SET>" : state.name()),"","&e>| Click to edit value").build())
                     .build(false);
 
             NBTItem nbtItem = new NBTItem(itemStack1);
