@@ -1,6 +1,7 @@
 package com.SMPCore;
 
 import com.SMPCore.Utilities.FlagRegistryConfig;
+import com.SMPCore.Utilities.TempPlayerDataHandler;
 import com.SMPCore.Utilities.WorldGuardAPI;
 import com.SMPCore.commands.CmdClaim;
 import com.SMPCore.listeners.EventListener;
@@ -15,6 +16,8 @@ public class Main extends JavaPlugin {
     public void onEnable() {
 
         Instance = this;
+
+        new TempPlayerDataHandler(this);
 
         new WorldGuardAPI();
 

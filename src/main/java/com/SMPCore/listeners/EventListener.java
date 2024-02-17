@@ -1,6 +1,7 @@
 package com.SMPCore.listeners;
 
 import com.MenuAPI.Utils;
+import com.SMPCore.Utilities.TempPlayerDataHandler;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -18,6 +19,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.concurrent.TimeUnit;
 
 public class EventListener implements Listener {
 
@@ -46,6 +49,9 @@ public class EventListener implements Listener {
             Block block = playerInteractEvent.getClickedBlock();
             assert block != null;
 
+            TempPlayerDataHandler.PlayerData playerData = TempPlayerDataHandler.getorAdd(player);
+            if (playerData.playerCooldownHandler.isOnCoolDown("claim_tool_use_"+action.name(), TimeUnit.SECONDS,1)) return;
+
             if (action == Action.LEFT_CLICK_BLOCK) {
 
                 regionSelector.selectPrimary(BlockVector3.at(block.getX(),block.getY(),block.getZ()),null);
@@ -59,6 +65,8 @@ public class EventListener implements Listener {
                         .getX()+"&7, y: &a"+block.getY()+"&7, z: &a"+block.getZ()));
 
             }
+
+            playerData.playerCooldownHandler.setOnCoolDown("claim_tool_use_"+action.name());
 
 
         }

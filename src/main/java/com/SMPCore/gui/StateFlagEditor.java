@@ -67,6 +67,7 @@ public class StateFlagEditor extends AbstractClickableGUI {
 
                 openPage(new StateFlagGroupEditor(getPlayer(),this,StateFlag.State.valueOf(nbtItem.getString("clickValue").toUpperCase())));
 
+
             }
 
 
