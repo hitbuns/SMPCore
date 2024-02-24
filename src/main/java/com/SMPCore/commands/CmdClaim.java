@@ -126,6 +126,8 @@ public class CmdClaim implements CommandExecutor, TabCompleter {
                 defaultDomain.setPlayerDomain(playerDomain);
                 protectedCuboidRegion.setOwners(defaultDomain);
                 regionManager.addRegion(protectedCuboidRegion);
+
+                
                 try {
                     regionManager.saveChanges();
                 } catch (StorageException e) {
@@ -140,6 +142,8 @@ public class CmdClaim implements CommandExecutor, TabCompleter {
                     .startsWith("protectarea_")).stream().findFirst().ifPresentOrElse(protectedRegion -> new RegionFlagEditor(player,!protectedRegion.getOwners()
                             .contains(player.getUniqueId()),protectedRegion,null).open(player),() -> player.sendMessage(Utils.color("&4[!] &cThere are no protectarea claim in this area!")));
             case "menu" -> {
+
+
 
             }
             case "help" -> {

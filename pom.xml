@@ -181,6 +181,13 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/PlaceholderAPI-2.11.3.jar</systemPath>
         </dependency>
+        <dependency>
+            <groupId>local.dependency</groupId>
+            <artifactId>BungeeChat</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/bundler/libraries/bungeecord-chat-1.16-R0.4.jar</systemPath>
+        </dependency>
     </dependencies>
 
     <properties>

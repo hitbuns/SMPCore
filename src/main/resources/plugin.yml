@@ -7,6 +7,9 @@ depend:
   - MenuAPI
   - WorldGuard
   - WorldEdit
+  - ParticleNativeAPI
+  - NBTAPI
+  - SoundParticleAPI
 
 
 commands:
@@ -15,3 +18,7 @@ commands:
       - pa
       - areaprotect
       - ap
+  waypoint:
+    usage: /waypoint
+  waypoints:
+    usage: /waypoints
