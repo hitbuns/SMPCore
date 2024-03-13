@@ -1,10 +1,11 @@
 package com.SMPCore;
 
 import com.SMPCore.Utilities.FlagRegistryConfig;
-import com.SMPCore.Utilities.TempPlayerDataHandler;
+import com.SMPCore.Utilities.TempEntityDataHandler;
 import com.SMPCore.Utilities.WorldGuardAPI;
 import com.SMPCore.Waypoints.WaypointListener;
 import com.SMPCore.commands.CmdClaim;
+import com.SMPCore.configs.CraftConfig;
 import com.SMPCore.listeners.EventListener;
 import com.SMPCore.mobs.MobTicker;
 import com.github.fierioziy.particlenativeapi.api.ParticleNativeAPI;
@@ -56,6 +57,8 @@ public class Main extends JavaPlugin {
 
         Instance = this;
 
+        CraftConfig.init(this);
+
         particleNativeAPI = ParticleNativeCore.loadAPI(this);
 
         particleTypes = Arrays.stream(particleNativeAPI.LIST_1_13.getClass().getFields()).sorted((o1, o2) ->
@@ -68,7 +71,7 @@ public class Main extends JavaPlugin {
         }).filter(Objects::nonNull).collect(Collectors.toMap(ParticleHolder::getId, particleHolder -> particleHolder));
 
 
-        new TempPlayerDataHandler(this);
+        new TempEntityDataHandler(this);
 
         new WorldGuardAPI();
 

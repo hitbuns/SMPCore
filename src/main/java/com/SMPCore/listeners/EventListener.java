@@ -1,14 +1,12 @@
 package com.SMPCore.listeners;
 
 import com.MenuAPI.Utils;
-import com.SMPCore.Utilities.TempPlayerDataHandler;
+import com.SMPCore.Utilities.TempEntityDataHandler;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
-import com.sk89q.worldedit.regions.selector.RegionSelectorType;
 import com.sk89q.worldedit.world.World;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.block.Block;
@@ -49,8 +47,8 @@ public class EventListener implements Listener {
             Block block = playerInteractEvent.getClickedBlock();
             assert block != null;
 
-            TempPlayerDataHandler.PlayerData playerData = TempPlayerDataHandler.getorAdd(player);
-            if (playerData.playerCooldownHandler.isOnCoolDown("claim_tool_use_"+action.name(), TimeUnit.SECONDS,1)) return;
+            TempEntityDataHandler.EntityData entityData = TempEntityDataHandler.getorAdd(player);
+            if (entityData.playerCooldownHandler.isOnCoolDown("claim_tool_use_"+action.name(), TimeUnit.SECONDS,1)) return;
 
             if (action == Action.LEFT_CLICK_BLOCK) {
 
@@ -66,7 +64,7 @@ public class EventListener implements Listener {
 
             }
 
-            playerData.playerCooldownHandler.setOnCoolDown("claim_tool_use_"+action.name());
+            entityData.playerCooldownHandler.setOnCoolDown("claim_tool_use_"+action.name());
 
 
         }

@@ -1,9 +1,12 @@
 package com.SMPCore.Utilities;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityRemoveEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -12,32 +15,32 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class TempPlayerDataHandler implements Listener {
+public class TempEntityDataHandler implements Listener {
 
-    private final Map<Player,PlayerData> playerMap;
-    public static TempPlayerDataHandler Instance;
+    private final Map<Entity, EntityData> playerMap;
+    public static TempEntityDataHandler Instance;
 
 
-    public static PlayerData getorAdd(Player player) {
-        PlayerData playerData = Instance.playerMap.get(player);
-        if (playerData == null) Instance.playerMap.put(player,playerData =
-                new PlayerData(player));
-        return playerData;
+    public static EntityData getorAdd(Entity player) {
+        EntityData entityData = Instance.playerMap.get(player);
+        if (entityData == null) Instance.playerMap.put(player, entityData =
+                new EntityData(player));
+        return entityData;
     }
 
-    public TempPlayerDataHandler(JavaPlugin javaPlugin) {
+    public TempEntityDataHandler(JavaPlugin javaPlugin) {
         Instance = this;
 
         javaPlugin.getServer().getPluginManager().registerEvents(this,javaPlugin);
 
         playerMap = Bukkit.getOnlinePlayers().stream().collect(Collectors.toMap(
-                player -> player, PlayerData::new
+                player -> player, EntityData::new
         ));
     }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent playerJoinEvent) {
-        playerMap.put(playerJoinEvent.getPlayer(),new PlayerData(playerJoinEvent.getPlayer()));
+        playerMap.put(playerJoinEvent.getPlayer(),new EntityData(playerJoinEvent.getPlayer()));
     }
 
     @EventHandler
@@ -45,11 +48,27 @@ public class TempPlayerDataHandler implements Listener {
         playerMap.remove(playerQuitEvent.getPlayer());
     }
 
-    public static class PlayerData {
+
+    @EventHandler
+    public void onDeath(EntityDeathEvent entityDeathEvent) {
+        if (entityDeathEvent.getEntity() instanceof Player) return;
+
+        playerMap.remove(entityDeathEvent.getEntity());
+
+    }
+
+    @EventHandler
+    public void onRemove(EntityRemoveEvent entityRemoveEvent) {
+        if (entityRemoveEvent.getEntity() instanceof Player) return;
+
+        playerMap.remove(entityRemoveEvent.getEntity());
+    }
+
+    public static class EntityData {
 
         public Map<String,Object> map = new HashMap<>();
-        public final CooldownHandler<Player> playerCooldownHandler;
-        private final Player player;
+        public final CooldownHandler<Entity> playerCooldownHandler;
+        private final Entity player;
 
         public <T> T get(String key,Class<T> clazz,T def) {
             try {
@@ -66,11 +85,11 @@ public class TempPlayerDataHandler implements Listener {
         }
 
 
-        public PlayerData(Player player) {
+        public EntityData(Entity player) {
             playerCooldownHandler = new CooldownHandler<>(this.player =player);
         }
 
-        public Player getPlayer() {
+        public Entity getPlayer() {
             return player;
         }
     }

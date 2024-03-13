@@ -16,7 +16,6 @@ import java.util.List;
 public class MobTicker implements Runnable{
 
     BukkitTask bukkitTask;
-    final List<LivingEntity> allMobs = new ArrayList<>();
     final List<LivingEntity> regen = new ArrayList<>();
     TickedSMPEvent tickedSMPEvent = new TickedSMPEvent();
     public static MobTicker Instance;
@@ -49,6 +48,8 @@ public class MobTicker implements Runnable{
             });
             counter = 0;
         }
+
+
 
         BukkitEventCaller.callEvent(tickedSMPEvent);
 

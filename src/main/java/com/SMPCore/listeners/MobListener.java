@@ -1,6 +1,15 @@
 package com.SMPCore.listeners;
 
+import com.MenuAPI.Utils;
+import com.SMPCore.Events.TickedSMPEvent;
+import com.SMPCore.Main;
+import com.SMPCore.Utilities.MobUtils;
+import com.SMPCore.Utilities.TempEntityDataHandler;
+import com.SMPCore.mobs.MobModifierType;
 import com.SMPCore.mobs.MobType;
+import com.SMPCore.mobs.MobTypeContainer;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
@@ -17,6 +26,23 @@ public class MobListener implements Listener {
 
         if (entitySpawnEvent.getEntity() instanceof LivingEntity livingEntity) {
 
+            MobTypeContainer mobTypeContainer = MobType.get(livingEntity.getType());
+            if (mobTypeContainer != null ) {
+                Location location = livingEntity.getLocation();
+                MobType mobType = mobTypeContainer.random(location);
+
+                if (mobType == null) return;
+
+                mobType.updateEntity(entitySpawnEvent,livingEntity, Utils.RNG_INT(0,100) >= 90 ?
+                        MobModifierType.values()[Utils.RNG_INT(0,MobModifierType.values()
+                                .length-1)] : MobModifierType.NORMAL,mobType
+                        .yGrader.getGrade(location));
+
+                TempEntityDataHandler
+                        .getorAdd(livingEntity).playerCooldownHandler.setOnCoolDown("active_spawn");
+
+
+            }
 
         }
 
@@ -29,9 +55,44 @@ public class MobListener implements Listener {
 
         if (entityDamageEvent.getEntity() instanceof LivingEntity livingEntity) {
 
+
+            MobType mobType = MobType.getMobType(livingEntity);
+
+            if (mobType != null) {
+
+                mobType.eventHook.onEvent(entityDamageEvent,livingEntity);
+
+                MobUtils.updateEntity(livingEntity,livingEntity
+                        .getHealth()-entityDamageEvent.getFinalDamage());
+            }
+
+
         }
 
 
+    }
+
+
+    @EventHandler
+    public void onTickedSMPEvent(TickedSMPEvent tickedSMPEvent) {
+
+        Bukkit.getScheduler().runTaskAsynchronously(Main.Instance,()-> {
+
+
+            Bukkit.getWorlds().forEach(world -> world.getLivingEntities()
+                    .stream().filter(livingEntity -> livingEntity
+                            .hasMetadata("mobType"))
+                    .forEach(livingEntity -> {
+
+                        MobType mobType = MobType.getMobType(livingEntity);
+
+                        if (mobType != null) mobType.eventHook.onEvent(tickedSMPEvent,
+                                livingEntity);
+
+
+                    }));
+
+        });
     }
 
 }
