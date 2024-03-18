@@ -15,6 +15,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 
@@ -69,14 +70,29 @@ public class MobListener implements Listener {
 
         }
 
+        if (entityDamageEvent instanceof EntityDamageByEntityEvent entityDamageByEntityEvent) {
+
+
+            LivingEntity livingEntity = Utils.getAttacker(entityDamageByEntityEvent
+                    .getDamager());
+
+            if (livingEntity == null) return;
+
+            MobType mobType = MobType.getMobType(livingEntity);
+
+            if (mobType != null) {
+
+                mobType.eventHook.onEvent(entityDamageEvent,livingEntity);
+            }
+
+        }
+
 
     }
 
 
     @EventHandler
     public void onTickedSMPEvent(TickedSMPEvent tickedSMPEvent) {
-
-        Bukkit.getScheduler().runTaskAsynchronously(Main.Instance,()-> {
 
 
             Bukkit.getWorlds().forEach(world -> world.getLivingEntities()
@@ -86,13 +102,14 @@ public class MobListener implements Listener {
 
                         MobType mobType = MobType.getMobType(livingEntity);
 
-                        if (mobType != null) mobType.eventHook.onEvent(tickedSMPEvent,
-                                livingEntity);
+                        if (mobType != null) {
+
+                                mobType.eventHook.onEvent(tickedSMPEvent,
+                                        livingEntity);
+                        }
 
 
                     }));
-
-        });
     }
 
 }

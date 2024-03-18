@@ -12,15 +12,38 @@ import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemDamageEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.concurrent.TimeUnit;
 
 public class EventListener implements Listener {
+
+//    @EventHandler
+//    public void onJoin(PlayerJoinEvent playerJoinEvent) {
+//
+//        playerJoinEvent.getPlayer().setResourcePack("https://www.dropbox.com/scl/fi/jhos5u893isxuair15gaa/quartzpack.zip?rlkey=if30890t05j20yv4yraxobnz6&dl=0");
+//
+//    }
+
+    @EventHandler (ignoreCancelled = true,priority = EventPriority.MONITOR)
+    public void onItemDamage(PlayerItemDamageEvent playerItemDamageEvent) {
+
+        ItemStack itemStack = playerItemDamageEvent.getItem();
+
+        if (Utils.isNullorAir(itemStack)) return;
+
+        NBTItem nbtItem = new NBTItem(itemStack);
+
+        if (nbtItem.getInteger("CustomModelData") == 12925)
+            playerItemDamageEvent.setDamage((int) Math.round(playerItemDamageEvent.getDamage()*0.1));
+    }
 
     @EventHandler
     public void onClaimWandInteract(PlayerInteractEvent playerInteractEvent) {

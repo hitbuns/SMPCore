@@ -33,7 +33,7 @@ public class MobUtils {
         double health = Math.max(0,healthValue);
 
         livingEntity.setCustomNameVisible(true);
-        livingEntity.setCustomName(Utils.color(s1+" &f"+ FormattedNumber.getInstance().getCommaFormattedNumber(health,1))+" &c✙");
+        livingEntity.setCustomName(Utils.color(s1+" &f"+ FormattedNumber.getInstance().getCommaFormattedNumber(health,1)+" &c✙"));
 
     }
 

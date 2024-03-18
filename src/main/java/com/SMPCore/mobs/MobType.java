@@ -1,12 +1,17 @@
 package com.SMPCore.mobs;
 
+import com.MenuAPI.Utilities.ItemBuilder;
 import com.MenuAPI.Utils;
 import com.SMPCore.Events.TickedSMPEvent;
 import com.SMPCore.Main;
 import com.SMPCore.Utilities.CooldownHandler;
 import com.SMPCore.Utilities.MobUtils;
+import com.SMPCore.Utilities.ParticleUtils;
 import com.SMPCore.Utilities.TempEntityDataHandler;
+import com.SoundAnimation.SoundAPI;
 import com.mongodb.lang.Nullable;
+import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
@@ -15,7 +20,10 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.EquipmentSlot;
@@ -23,10 +31,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.LazyMetadataValue;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -47,10 +52,10 @@ public enum MobType {
                             TimeUnit.SECONDS,5))) {
                 cooldownHandler.setOnCoolDown("fast");
 
-                livingEntity.addPotionEffect(PotionEffectType.SPEED.createEffect(60,cooldownHandler
+                livingEntity.addPotionEffect(PotionEffectType.SPEED.createEffect(60,Math.min(2,cooldownHandler
                         .isOnCoolDown("last_fast",TimeUnit.SECONDS,
                                 30) ? entityData
-                        .updateData("fastCount",int.class,initial -> ++initial,1) : 0));
+                        .updateData("fastCount",int.class,initial -> ++initial,1) : 0)));
 
                 cooldownHandler.setOnCoolDown("last_fast");
 
@@ -68,14 +73,111 @@ public enum MobType {
     },"&eWalker",10,2,0,2.5,0.25,0.02),
     BRUTE(EntityType.ZOMBIE,(event,livingEntity) -> {
 
+        if (event instanceof EntityDamageEvent entityDamageEvent &&
+        entityDamageEvent.getEntity() == livingEntity &&
+        TempEntityDataHandler.getorAdd(livingEntity)
+                .updateData("bone_plating",
+                        Integer.class,initial -> initial-1,0) > 0) {
+
+            entityDamageEvent.setDamage(entityDamageEvent.getDamage()*(0.7-0.05*MobType
+                    .getGrade(livingEntity)));
+            ParticleUtils.drawSphere(livingEntity.getEyeLocation(),
+                    Main.Instance.getParticleNativeAPI().LIST_1_13.COMPOSTER,
+                    2.5,10,3, Bukkit
+                            .getOnlinePlayers().toArray(Player[]::new));
+
+
+        }
+
+        if (event instanceof EntityDamageByEntityEvent entityDamageByEntityEvent &&
+        entityDamageByEntityEvent.getEntity() == livingEntity) {
+
+            TempEntityDataHandler.EntityData entityData = TempEntityDataHandler.getorAdd(livingEntity);
+
+            if (entityData.get("explode_stage",Boolean.class,false)) return;
+
+            int grade = MobType.getGrade(livingEntity);
+
+            int delay = 120-5*grade;
+
+            livingEntity.addPotionEffect(PotionEffectType.SPEED.createEffect(delay,1));
+            entityData.playerCooldownHandler.setOnCoolDown("explode_timeStamp");
+            entityData.updateData("explode_stage",Boolean.class,initial ->
+                    true,true);
+            entityData.updateData("itemStack_helmet",ItemStack.class,initial ->
+                    livingEntity.getEquipment()
+                            .getHelmet(),null);
+
+
+            livingEntity.getEquipment().setHelmet(new ItemBuilder(Material.TNT).build(false));
+
+
+
+        }
+
+
+        if (event instanceof TickedSMPEvent) {
+
+            TempEntityDataHandler.EntityData entityData = TempEntityDataHandler
+                    .getorAdd(livingEntity);
+
+            if (!entityData.get("explode_stage",Boolean.class,false)) return;
+
+            int grade = MobType.getGrade(livingEntity);
+            if (!entityData.playerCooldownHandler.isOnCoolDown("explode_timeStamp",
+                    TimeUnit.MILLISECONDS,50*(120-5L*MobType
+                            .getGrade(livingEntity))))  {
+                double health = livingEntity.getHealth(),distance = 3+grade;
+
+                Main.Instance.getParticleNativeAPI()
+                                .LIST_1_8.EXPLOSION_LARGE.packet(true,livingEntity
+                                .getEyeLocation()).sendTo(Bukkit.getOnlinePlayers());
+                List<Player> players = ParticleUtils.getNearbyPlayers(livingEntity
+                        .getEyeLocation(),distance,player ->
+                        player.getEyeLocation().distance(player
+                                .getLocation()) >= distance);
+                SoundAPI.playSound(livingEntity,"brute_explode");
+                players.forEach(player -> {
+                    double v = player.getLocation().distance(livingEntity
+                            .getEyeLocation());
+                    player.damage(health*((v/(2+v))));
+                    player.setVelocity(livingEntity
+                            .getEyeLocation()
+                            .toVector().subtract(player
+                                    .getLocation()
+                                    .toVector()).multiply(-0.5));
+                });
+
+                livingEntity.damage(livingEntity.getMaxHealth());
+
+                entityData.updateData("explode_stage",Boolean.class,initial ->
+                        false,false);
+                livingEntity.getEquipment()
+                        .setHelmet(entityData.get("itemStack_helmet",ItemStack.class,null));
+
+                return;
+            }
+
+            if (entityData.updateData("explode_particle_counter",Integer.class,
+                    initial -> initial >= 31 ? 0 : initial+1,0) >= 30) ParticleUtils
+                    .makeCircle(location ->
+                            Main.Instance
+                                    .getParticleNativeAPI()
+                                    .LIST_1_13.DUST
+                                    .color(Color.fromRGB(255,0,0),1)
+                                    .packet(true,location),livingEntity.getLocation()
+                    ,10,50,3+grade,Bukkit.getOnlinePlayers()
+                                    .toArray(Player[]::new));
+        }
 
 
     },location -> location
             .getY() <= 65 ? 50 : 0,(event,livingEntity,grade)-> {
 
+        TempEntityDataHandler.getorAdd(livingEntity)
+                .updateData("bone_plating",Integer.class,initial -> 3,3);
 
-
-    },"&cBrute",25,3,0,2.5,0.25,0.02)
+    },"&cBrute",30,1,-0.3,5,0.35,0.01)
 
 
     ;
@@ -141,8 +243,8 @@ public enum MobType {
         this.displayName = Utils.color(displayName);
         this.yGrader = yGrader != null ? yGrader :
                 location -> Math.min(Math.max(Utils.RNG_INT(location
-                        .getY() >= 70 ? 1 : 1+(location.getY()-70)/20,location.getY() >= 85 ? 1 : 1+(location
-                        .getY()-85)/12),0),6);
+                        .getY() >= 70 ? 1 : 1+(70-location.getY())/20,location.getY() >= 85 ? 1 : 1+(85-location
+                        .getY())/12),1),6);
         this.equipmentHandler = new HashMap<>();
         equipmentHandler.put(EquipmentSlot.HEAD,helmetOdds);
         equipmentHandler.put(EquipmentSlot.CHEST,chestplateOdds);
@@ -157,6 +259,11 @@ public enum MobType {
 
     public static LivingEntity updateEntity(@Nullable EntitySpawnEvent entitySpawnEvent, LivingEntity livingEntity, MobType mobType, MobModifierType mobModifierType, int grade) {
         return mobType.updateEntity(entitySpawnEvent,livingEntity,mobModifierType,grade);
+    }
+
+    public static int getGrade(LivingEntity livingEntity) {
+        return livingEntity != null && livingEntity.hasMetadata("grade")
+                ? livingEntity.getMetadata("grade").get(0).asInt() : 0;
     }
 
     public LivingEntity updateEntity(@Nullable EntitySpawnEvent entitySpawnEvent,LivingEntity livingEntity,MobModifierType mobModifierType,int grade) {
@@ -178,6 +285,10 @@ public enum MobType {
         livingEntity.setMetadata("grade",new LazyMetadataValue(Main.Instance, LazyMetadataValue.CacheStrategy.NEVER_CACHE,() -> finalGrade));
         livingEntity.setMetadata("mobType",new LazyMetadataValue(Main.Instance, LazyMetadataValue.CacheStrategy.NEVER_CACHE, this::name));
         livingEntity.setMetadata("mobModifierType",new LazyMetadataValue(Main.Instance, LazyMetadataValue.CacheStrategy.NEVER_CACHE, mobModifierType::name));
+        livingEntity.setMetadata("displayName",new LazyMetadataValue(Main.Instance,
+                LazyMetadataValue.CacheStrategy.NEVER_CACHE,()->
+                mobModifierType.displayName+" "+displayName +" "+
+                MobUtils.getGrade(finalGrade)));
 
         if (mobModifierType.listener != null) mobModifierType.listener.onSpawn(entitySpawnEvent,livingEntity,grade);
 

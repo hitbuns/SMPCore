@@ -22,14 +22,14 @@ public class MobTicker implements Runnable{
 
     public MobTicker() {
         Instance = this;
-        bukkitTask = Bukkit.getScheduler().runTaskTimer(Main.Instance,this,20L,20L);
+        bukkitTask = Bukkit.getScheduler().runTaskTimerAsynchronously(Main.Instance,this,1L,1L);
     }
 
     int counter;
 
     @Override
     public void run() {
-        if (++counter >= 15) {
+        if (++counter >= 15*20) {
 
             regen.removeIf(livingEntity -> {
 
@@ -41,7 +41,7 @@ public class MobTicker implements Runnable{
                         max*0.05));
                 SoundAPI.playSound(livingEntity,"regen_heal");
 
-                ParticleUtils.makeCircle(location -> Main.Instance.getParticleNativeAPI().LIST_1_13.HEART.packet(true,location,1),livingEntity.getLocation(),30,50,1.5,Bukkit.getOnlinePlayers()
+                ParticleUtils.makeCircle(location -> Main.Instance.getParticleNativeAPI().LIST_1_13.HEART.packet(true,location,1),livingEntity.getLocation(),15,50,2.5,Bukkit.getOnlinePlayers()
                         .toArray(Player[]::new));
 
                 return false;
@@ -50,8 +50,8 @@ public class MobTicker implements Runnable{
         }
 
 
-
-        BukkitEventCaller.callEvent(tickedSMPEvent);
+        Bukkit.getScheduler().runTask(Main.Instance,() ->
+                BukkitEventCaller.callEvent(tickedSMPEvent));
 
     }
 
