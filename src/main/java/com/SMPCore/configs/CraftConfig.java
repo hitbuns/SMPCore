@@ -4,8 +4,6 @@ import com.MenuAPI.Config;
 import com.SMPCore.gui.CraftAdminListManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
-
 public class CraftConfig extends Config {
 
 

@@ -2,7 +2,6 @@ package com.SMPCore.listeners;
 
 import com.MenuAPI.Utils;
 import com.SMPCore.Events.TickedSMPEvent;
-import com.SMPCore.Main;
 import com.SMPCore.Utilities.MobUtils;
 import com.SMPCore.Utilities.TempEntityDataHandler;
 import com.SMPCore.mobs.MobModifierType;
@@ -10,7 +9,6 @@ import com.SMPCore.mobs.MobType;
 import com.SMPCore.mobs.MobTypeContainer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

@@ -1,5 +1,7 @@
 package com.SMPCore.listeners;
 
+import com.MenuAPI.ItemAdder;
+import com.MenuAPI.Utilities.impl.HeadUtils;
 import com.MenuAPI.Utils;
 import com.SMPCore.Utilities.TempEntityDataHandler;
 import com.sk89q.worldedit.LocalSession;
@@ -110,6 +112,12 @@ public class EventListener implements Listener {
 
         }
 
+    }
+
+    @EventHandler
+    public void onJoin(PlayerJoinEvent playerJoinEvent) {
+        ItemAdder.addItem(playerJoinEvent
+                .getPlayer(), HeadUtils.getItemHead("http://textures.minecraft.net/texture/dd4226d3d5b102c0ee4bac7d8db599177c9a4ce7bb45bb47faf67fe0c543bd04"));
     }
 
 }

@@ -135,7 +135,7 @@ public enum MobType {
                 List<Player> players = ParticleUtils.getNearbyPlayers(livingEntity
                         .getEyeLocation(),distance,player ->
                         player.getEyeLocation().distance(player
-                                .getLocation()) >= distance);
+                                .getLocation()) <= distance);
                 SoundAPI.playSound(livingEntity,"brute_explode");
                 players.forEach(player -> {
                     double v = player.getLocation().distance(livingEntity
@@ -145,10 +145,10 @@ public enum MobType {
                             .getEyeLocation()
                             .toVector().subtract(player
                                     .getLocation()
-                                    .toVector()).multiply(-0.5));
+                                    .toVector()).normalize().multiply(-0.75*(distance-v)));
                 });
 
-                livingEntity.damage(livingEntity.getMaxHealth());
+                livingEntity.damage(health);
 
                 entityData.updateData("explode_stage",Boolean.class,initial ->
                         false,false);
@@ -159,15 +159,25 @@ public enum MobType {
             }
 
             if (entityData.updateData("explode_particle_counter",Integer.class,
-                    initial -> initial >= 31 ? 0 : initial+1,0) >= 30) ParticleUtils
-                    .makeCircle(location ->
-                            Main.Instance
-                                    .getParticleNativeAPI()
-                                    .LIST_1_13.DUST
-                                    .color(Color.fromRGB(255,0,0),1)
-                                    .packet(true,location),livingEntity.getLocation()
-                    ,10,50,3+grade,Bukkit.getOnlinePlayers()
-                                    .toArray(Player[]::new));
+                    initial -> initial >= 31 ? 0 : initial+1,0) >= 10) {
+                long totalTimeFrame = 50*(120-5L*MobType
+                        .getGrade(livingEntity)), milliSeconds = entityData.playerCooldownHandler.getTimeLeftOnCooldown("explode_timeStamp",
+                        TimeUnit.MILLISECONDS,totalTimeFrame,TimeUnit.MILLISECONDS);
+                double progress = (double) milliSeconds / totalTimeFrame;
+                Color color = Color.fromRGB(Math.max(0,Math.min( (int) (progress < 0.5 ? 0 : Math.round(255-(progress-0.5)*1000)),255)),
+                        Math.max(0,Math.min( (int) (progress < 0.65 ? 255 : Math.round(255-(progress-0.65)*750)),255)),
+                        Math.max(0,Math.min( (int) (progress > 0.85 ? 0 : Math.round(0+(0.85-progress)*750)),255)));
+                ParticleUtils
+                        .makeCircle(location ->
+                                        Main.Instance
+                                                .getParticleNativeAPI()
+                                                .LIST_1_13.DUST
+                                                .color(color,1)
+                                                .packet(true,location),livingEntity.getLocation()
+                                ,10,50,3+grade,Bukkit.getOnlinePlayers()
+                                        .toArray(Player[]::new));
+                SoundAPI.playSound(livingEntity,"brute_plan_to_explode", (float) (progress*2f), (float) (progress*2f));
+            }
         }
 
 
@@ -177,7 +187,8 @@ public enum MobType {
         TempEntityDataHandler.getorAdd(livingEntity)
                 .updateData("bone_plating",Integer.class,initial -> 3,3);
 
-    },"&cBrute",30,1,-0.3,5,0.35,0.01)
+    },"&cBrute",30,1,-0.3,5,0.35,0.01,
+            25,25,25,25,25,25)
 
 
     ;
@@ -276,6 +287,8 @@ public enum MobType {
         maxHealth.setBaseValue(health);
         maxHealth.addModifier(new AttributeModifier("grade_maxhealth_"+livingEntity.getEntityId()+"_"+grade,healthIncrement*(grade-1), AttributeModifier.Operation.ADD_NUMBER));
 
+//        livingEntity.setMaxHealth(health+healthIncrement*(grade-1));
+//
         livingEntity.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).addModifier(new AttributeModifier("grade_attackdamage_"+livingEntity.getEntityId()+"_"+grade,
                 Math.max(damage+damageIncrement*(grade-1),1), AttributeModifier.Operation.ADD_NUMBER));
         livingEntity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).addModifier(new AttributeModifier("grade_movespd_"+livingEntity.getEntityId()+"_"+grade,
@@ -309,6 +322,8 @@ public enum MobType {
         entityEquipment.setBoots(equipment.get(EquipmentSlot.FEET));
         entityEquipment.setItemInMainHand(equipment.get(EquipmentSlot.HAND));
         entityEquipment.setItemInOffHand(equipment.get(EquipmentSlot.OFF_HAND));
+
+        livingEntity.setHealth(livingEntity.getMaxHealth());
 
         MobUtils.updateEntity(livingEntity);
 

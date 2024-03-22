@@ -7,7 +7,6 @@ import com.MenuAPI.Utilities.DecorationUtils;
 import com.MenuAPI.Utilities.DescriptionBuilder;
 import com.MenuAPI.Utilities.ItemBuilder;
 import com.MenuAPI.Utils;
-import com.sk89q.worldguard.protection.flags.RegionGroup;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Material;

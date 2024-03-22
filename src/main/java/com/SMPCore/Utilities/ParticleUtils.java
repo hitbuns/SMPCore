@@ -1,10 +1,8 @@
 package com.SMPCore.Utilities;
 
 import com.SMPCore.Main;
-import com.github.fierioziy.particlenativeapi.api.ParticleNativeAPI;
 import com.github.fierioziy.particlenativeapi.api.packet.ParticlePacket;
 import com.github.fierioziy.particlenativeapi.api.particle.type.ParticleType;
-import com.github.fierioziy.particlenativeapi.core.ParticleNativeCore;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -13,7 +11,10 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 

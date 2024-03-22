@@ -6,8 +6,6 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.flags.Flag;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
-
 public class FlagRegistryConfig extends Config {
 
     public static FlagRegistryConfig Instance;

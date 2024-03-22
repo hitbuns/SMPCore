@@ -2,7 +2,6 @@ package com.SMPCore.mobs;
 
 import com.MenuAPI.Utilities.ItemBuilder;
 import com.MenuAPI.Utils;
-import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
@@ -23,7 +22,7 @@ public class EquipmentHandler {
         EquipmentSlot[] equipmentSlots = EquipmentSlot.values();
         for (EquipmentSlot equipmentSlot : equipmentSlots) {
             double equipmentOdd = equipmentOdds.getOrDefault(equipmentSlot,-1D), rngFactor = equipmentOdd
-            < 0 ? -1 : (yLevel >= 70 ? 10 : 10+yLevel*2)*(equipmentOdd/(equipmentOdd+25));
+            < 0 ? -1 : (yLevel >= 70 ? 10 : 10+(70-yLevel)*1.5)*(equipmentOdd/(equipmentOdd+25));
             int enchantLevel = Utils.RNG_INT(-1-5*(1-rngFactor/(rngFactor+20)),1+4*
                     rngFactor/(rngFactor+30));
             if (equipmentSlot != EquipmentSlot.HAND && equipmentSlot != EquipmentSlot.OFF_HAND) {
@@ -38,7 +37,7 @@ public class EquipmentHandler {
                                 .name()+"_"+switch (equipmentSlot) {
 
                             case CHEST -> "CHESTPLATE";
-                            case LEGS -> "LEGS";
+                            case LEGS -> "LEGGINGS";
                             case FEET -> "BOOTS";
                             default -> "HELMET";
 
@@ -116,7 +115,7 @@ public class EquipmentHandler {
     }
 
     public static Material randomRecurse(Intention intention,Material material,double rngFactor) {
-         if (Utils.RNG_INT(0,100-3*(material != null ? material.priority :0)) >= rngFactor) {
+         if (Utils.RNG_INT(0,100-2*(material != null ? material.priority :0)) >= 90-rngFactor) {
              Material[] materials = intention == Intention.TOOL ? Material.allTools : Material.allArmor;
              if (material == null) return randomRecurse(intention,materials[0],rngFactor);
              for (Material material1 : materials) {
