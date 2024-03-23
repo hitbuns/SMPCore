@@ -14,10 +14,12 @@ public enum MobModifierType {
 
     },"&2&l☠"),
     SWIFT((event, livingEntity, grade) -> {
-
+        livingEntity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)
+                .addModifier(new AttributeModifier("swift_max_"+UUID.randomUUID()+"_"
+                +Utils.RNG_INT(0,1000),1.3+0.05*grade, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
     },"&b&l\uD83E\uDD7E"),
     REGEN((event, livingEntity, grade) -> {
-
+        MobTicker.Instance.regen.add(livingEntity);
     },"&d&l✙"),
     REINFORCED((event, livingEntity, grade) -> {
         livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).addModifier(new AttributeModifier("reinforced_max_"+UUID.randomUUID()+"_"

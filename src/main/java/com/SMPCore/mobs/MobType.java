@@ -159,7 +159,7 @@ public enum MobType {
             }
 
             if (entityData.updateData("explode_particle_counter",Integer.class,
-                    initial -> initial >= 31 ? 0 : initial+1,0) >= 10) {
+                    initial -> initial >= 11 ? 0 : initial+1,0) >= 10) {
                 long totalTimeFrame = 50*(120-5L*MobType
                         .getGrade(livingEntity)), milliSeconds = entityData.playerCooldownHandler.getTimeLeftOnCooldown("explode_timeStamp",
                         TimeUnit.MILLISECONDS,totalTimeFrame,TimeUnit.MILLISECONDS);
