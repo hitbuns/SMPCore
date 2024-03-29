@@ -393,9 +393,16 @@ public class ParticleUtils {
         Vector face = facingDirection.clone().setY(0).normalize();
         double ca = Math.max(0,angle);
         return location.getWorld().getNearbyEntities(location,radius,radius,radius)
-                .stream().filter(player -> {
+                .stream().map(entity -> {
+                    try {
+                        return  (LivingEntity) entity;
+                    } catch (Exception exception) {
+                        return null;
+                    }
 
-                    if (player.getLocation().distance(location) > radius) return false;
+                }).filter(player -> {
+
+                    if (player == null || player.getLocation().distance(location) > radius) return false;
 
                     Vector v = location.toVector().subtract(player.getLocation().toVector()).setY(0).normalize();
                     return Math.toDegrees(face.multiply(-1).angle(v)) <= ca/2;

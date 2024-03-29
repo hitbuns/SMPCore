@@ -1,5 +1,7 @@
 package com.SMPCore.mobs;
 
+import com.MenuAPI.Utilities.BukkitLimitTask;
+import com.MenuAPI.Utilities.FormattedNumber;
 import com.MenuAPI.Utilities.ItemBuilder;
 import com.MenuAPI.Utils;
 import com.SMPCore.Events.TickedSMPEvent;
@@ -10,26 +12,20 @@ import com.SMPCore.Utilities.ParticleUtils;
 import com.SMPCore.Utilities.TempEntityDataHandler;
 import com.SoundAnimation.SoundAPI;
 import com.mongodb.lang.Nullable;
-import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.Event;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntitySpawnEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.LazyMetadataValue;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.RayTraceResult;
+import org.bukkit.util.Vector;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -64,7 +60,8 @@ public enum MobType {
 
         }
 
-    },location -> 100,(event,livingEntity,grade)-> {
+    },location -> location
+            .getY() >= 25 ? 50+location.getY() : 0,(event,livingEntity,grade)-> {
         livingEntity.addPotionEffect(PotionEffectType.SLOW.createEffect(500,2));
         livingEntity.addPotionEffect(PotionEffectType.REGENERATION.createEffect(100,1));
 
@@ -100,7 +97,7 @@ public enum MobType {
 
             int delay = 120-5*grade;
 
-            livingEntity.addPotionEffect(PotionEffectType.SPEED.createEffect(delay,1));
+            livingEntity.addPotionEffect(PotionEffectType.SPEED.createEffect(delay,3));
             entityData.playerCooldownHandler.setOnCoolDown("explode_timeStamp");
             entityData.updateData("explode_stage",Boolean.class,initial ->
                     true,true);
@@ -140,7 +137,7 @@ public enum MobType {
                 players.forEach(player -> {
                     double v = player.getLocation().distance(livingEntity
                             .getEyeLocation());
-                    player.damage(health*((v/(2+v))));
+                    player.damage(health*(((distance-v)/(2+(distance-v)))));
                     player.setVelocity(livingEntity
                             .getEyeLocation()
                             .toVector().subtract(player
@@ -188,7 +185,280 @@ public enum MobType {
                 .updateData("bone_plating",Integer.class,initial -> 3,3);
 
     },"&cBrute",30,1,-0.3,5,0.35,0.01,
-            25,25,25,25,25,25)
+            25,25,25,25,25,25),
+
+
+    //CREEPER
+    HOARD_CALLER(EntityType.CREEPER,(event, livingEntity) -> {
+
+        if (event instanceof EntityExplodeEvent entityExplodeEvent && entityExplodeEvent
+                .getEntity() == livingEntity) {
+
+            entityExplodeEvent.setYield((MobType.getGrade(livingEntity)*0.15f+1)* entityExplodeEvent.getYield());
+            entityExplodeEvent.blockList().clear();
+
+        }
+
+        if (event instanceof EntityDamageByEntityEvent entityDamageByEntityEvent && entityDamageByEntityEvent
+                .getDamager() == livingEntity && entityDamageByEntityEvent.getCause() == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION) {
+
+            entityDamageByEntityEvent.setDamage(0);
+            new BukkitLimitTask(0,10,14) {
+
+                Location base = livingEntity.getLocation().clone(), location = livingEntity.getEyeLocation().clone().add(0,5,0),
+                calc = location.clone().subtract(base).multiply(1/14D);
+
+                @Override
+                public void run() {
+                    super.run();
+
+                    if (getCurrentCount() >= getCountMax()) {
+                        base.getWorld().strikeLightningEffect(base).setLifeTicks(60);
+                        int grade = getGrade(livingEntity);
+                        for (int i = 0; i < grade; i++) {
+                            base.getWorld().spawnEntity(location,EntityType.ZOMBIE);
+                        }
+                        SoundAPI.playSound(base,"hoard_summon", -grade*0.4f, 0,Bukkit.getOnlinePlayers().toArray(Player[]::new));
+                        return;
+                    }
+
+                    Collection<? extends Player> players = Bukkit.getOnlinePlayers();
+                    Player[] players1 = players.toArray(Player[]::new);
+
+                    Main.Instance.getParticleNativeAPI().LIST_1_13.SOUL_FIRE_FLAME.packet(true,location.subtract(calc))
+                            .sendTo(players);
+
+                    ParticleUtils.makeCircle(Main.Instance.getParticleNativeAPI().LIST_1_13.ANGRY_VILLAGER,
+                            base,1,5,50,2,players1);
+
+                    double progress = 1D - (double) getCurrentCount() / getCountMax();
+                    SoundAPI.playSound(base,"hoard_incoming", (float) (progress*2.2f), 0,players1);
+
+
+
+                }
+            };
+
+        }
+
+
+    },location -> 100,(event, livingEntity, grade) -> {
+
+    },"&2Hoard &aCaller",20,0,0.1,3,0,0.02),
+    TIME_BOMB(EntityType.CREEPER,(event, livingEntity) -> {
+
+        if (event instanceof TickedSMPEvent && livingEntity instanceof Creeper creeper) {
+
+            TempEntityDataHandler.EntityData entityData = TempEntityDataHandler.getorAdd(livingEntity);
+
+            if (entityData.get("triggered",Boolean.class,false)) {
+
+                if (!entityData.playerCooldownHandler.isOnCoolDown("trigger_active",TimeUnit.SECONDS,30)) {
+                    creeper.explode();
+                    return;
+                }
+
+                double progress = entityData.playerCooldownHandler.getTimeLeftOnCooldown("trigger_active",TimeUnit.MILLISECONDS,30000,TimeUnit.MILLISECONDS)/
+                        30000D;
+
+                int stage = entityData.get("beep_stage",Integer.class,1),
+                        beep = entityData.updateData("last_beep",Integer.class,initial -> initial >= 20-stage*5 ? 0 : initial+1,0);
+
+                if (beep == 0) {
+                    entityData.updateData("beep_stage",Integer.class,initial -> initial+1,1);
+                    SoundAPI.playSound(livingEntity, "time_bomb_beep", (float) (progress * 3), 0f);
+                }
+
+                creeper.setCustomName(Utils.color("&8["+Utils.bar((float) progress)+"&8] &f"+ FormattedNumber.getInstance().getCommaFormattedNumber(creeper
+                        .getHealth(),1)+" &c✙"));
+
+                return;
+            }
+
+            double radius = 10+getGrade(livingEntity)*1.5;
+
+            Player[] players = Arrays.stream(ParticleUtils.getEntitiesInAngle(livingEntity, 35, radius)).map(livingEntity1 -> {
+
+                try {
+                    if (!(livingEntity1 instanceof Player player)) return null;
+
+                    if (player.getGameMode() != GameMode.SURVIVAL && player
+                            .getGameMode() != GameMode.ADVENTURE) return null;
+
+                    Vector vector = livingEntity
+                            .getEyeLocation()
+                            .toVector().subtract(player
+                                    .getLocation()
+                                    .toVector()).normalize();
+
+
+                    ParticleUtils.drawLine(livingEntity.getEyeLocation(),livingEntity.getEyeLocation()
+                            .clone().add(vector),Main.Instance.getParticleNativeAPI().LIST_1_13.COMPOSTER,1,player);
+
+                    RayTraceResult rayTraceResult = livingEntity1.getWorld().rayTraceBlocks(livingEntity.getEyeLocation(),vector,radius*1.5,
+                            FluidCollisionMode.NEVER);
+
+                    if (rayTraceResult == null || rayTraceResult.getHitBlock() == null) return null;
+
+
+                    return player;
+                } catch (Exception exception) {
+                    return null;
+                }
+
+            }).filter(Objects::nonNull).toArray(Player[]::new);
+
+            if (players.length < 1) {
+                Player[] players1 = Bukkit.getOnlinePlayers().toArray(Player[]::new);
+                for (int i = 0; i < 5; i++) {
+                    ParticleUtils.arc(location -> Main.Instance.getParticleNativeAPI()
+                                    .LIST_1_13.DUST.color(Color.fromRGB(200,10,10),1).packet(true,location),
+                            livingEntity.getEyeLocation(),livingEntity.getEyeLocation().getDirection(),35,2,50,radius*(i+1)/5, players1);
+                }
+
+                ParticleUtils.arc(location -> Main.Instance.getParticleNativeAPI()
+                                .LIST_1_13.DUST.color(Color.fromRGB(200,200,200),1).packet(true,location),
+                        livingEntity.getEyeLocation(),livingEntity.getEyeLocation().getDirection(),35,2,50,radius*6/5, players1);
+
+                if (!entityData.playerCooldownHandler.isOnCoolDown("yaw_change",TimeUnit.SECONDS,20)) {
+
+                    entityData.playerCooldownHandler.setOnCoolDown("yaw_change");
+                    entityData.updateData("yawIncrementChange",Integer.class,initial -> 0,0);
+                    entityData.updateData("yawData",Float.class,initial -> (float) (Utils.RNGValue(-135,135)/14),creeper
+                            .getLocation().getYaw());
+
+                }
+
+                int i = entityData.updateData("yawIncrementChange",Integer.class,initial -> ++initial,0);
+
+                if (i <= 42 && i % 3 == 0) {
+
+                    Location location = creeper.getLocation().clone();
+                    location.setYaw(location.getYaw()+entityData.get("yawData",Float.class,0f));
+                    creeper.teleport(location);
+
+                }
+
+                return;
+            }
+
+
+            entityData.updateData("triggered",Boolean.class,initial -> true,true);
+            entityData.playerCooldownHandler.setOnCoolDown("trigger_active");
+            SoundAPI.playSound(livingEntity,"trigger_time_bomb");
+
+
+
+        }
+
+    },location -> location.getY() >= 40 ? 0 : (40-location.getY())*0.25,(event, livingEntity, grade) -> {
+
+        if (livingEntity instanceof Creeper creeper) {
+            creeper.setAI(false);
+            creeper.setExplosionRadius(20+5*grade);
+            creeper.setPowered(true);
+        }
+
+    },"&eTime &cBomb",30,0,-1,15,0,-1),
+
+
+    //SKELETON
+    SHARPSHOOTER(EntityType.SKELETON,(event, livingEntity) -> {
+
+        if (event instanceof EntityShootBowEvent entityShootBowEvent) {
+            entityShootBowEvent.setCancelled(true);
+        }
+
+        if (event instanceof TickedSMPEvent) {
+
+            TempEntityDataHandler.EntityData entityData = TempEntityDataHandler.getorAdd(livingEntity);
+
+            if (!entityData.playerCooldownHandler.isOnCoolDown("last_powerup",TimeUnit.SECONDS,15)) {
+
+                int grade = getGrade(livingEntity);
+
+                double radius = 15+5*grade;
+
+                Player target = entityData.get("targetting",Player.class,null);
+                Location location = livingEntity.getEyeLocation().clone().add(livingEntity.getEyeLocation().getDirection().normalize().multiply(2));
+                Main.Instance.getParticleNativeAPI().LIST_1_13.COMPOSTER.packet(true,location).sendTo(Bukkit.getOnlinePlayers());
+
+                RayTraceResult rayTraceResult = livingEntity.getWorld().rayTrace(location,livingEntity.getEyeLocation().getDirection(),radius,FluidCollisionMode.NEVER,true,1,entity ->
+                        entity == target);
+
+                if (target != null && rayTraceResult != null && rayTraceResult.getHitBlock() != null) {
+
+                    if (entityData.updateData("targetCounter",Integer.class,initial -> initial >= 15 ? initial+1 : -1,0) == -1) {
+                        Snowball snowball = livingEntity.launchProjectile(Snowball.class);
+                        snowball.setMetadata("damage",new LazyMetadataValue(Main.Instance, LazyMetadataValue.CacheStrategy.NEVER_CACHE,()-> 10+3*grade));
+                        snowball.setVelocity(snowball.getLocation().toVector().subtract(target.getLocation().toVector()).multiply(-2));
+                        return;
+                    }
+
+                    return;
+                }
+
+                Arrays.stream(ParticleUtils.getEntitiesInAngle(livingEntity, 15, radius)).map(livingEntity1 -> {
+
+                    try {
+                        if (!(livingEntity1 instanceof Player player)) return null;
+
+                        if (player.getGameMode() != GameMode.SURVIVAL && player
+                                .getGameMode() != GameMode.ADVENTURE) return null;
+
+                        Vector vector = livingEntity
+                                .getEyeLocation()
+                                .toVector().subtract(player
+                                        .getLocation()
+                                        .toVector()).normalize();
+
+
+                        RayTraceResult rayTraceResult1 = livingEntity1.getWorld().rayTraceBlocks(livingEntity.getEyeLocation(), vector, radius * 1.5,
+                                FluidCollisionMode.NEVER);
+
+                        if (rayTraceResult1 == null || rayTraceResult1.getHitBlock() == null) return null;
+
+
+                        return player;
+                    } catch (Exception exception) {
+                        return null;
+                    }
+
+                }).filter(Objects::nonNull).min(Comparator.comparingDouble(o -> o.getLocation().distance(livingEntity.getEyeLocation()))).ifPresentOrElse(player -> {
+                    entityData.updateData("targetting",Player.class,initial -> player,null);
+                },() -> {});
+
+                return;
+
+            }
+
+            if (!entityData.playerCooldownHandler.isOnCoolDown("yaw_change",TimeUnit.SECONDS,20)) {
+
+                entityData.playerCooldownHandler.setOnCoolDown("yaw_change");
+                entityData.updateData("yawIncrementChange",Integer.class,initial -> 0,0);
+                entityData.updateData("yawData",Float.class,initial -> (float) (Utils.RNGValue(-135,135)/14),livingEntity
+                        .getLocation().getYaw());
+
+            }
+
+            int i = entityData.updateData("yawIncrementChange",Integer.class,initial -> ++initial,0);
+
+            if (i <= 42 && i % 3 == 0) {
+
+                Location location = livingEntity.getLocation().clone();
+                location.setYaw(location.getYaw()+entityData.get("yawData",Float.class,0f));
+                livingEntity.teleport(location);
+
+            }
+
+
+
+        }
+
+
+    },location -> 100,(event, livingEntity, grade) -> {
+
+    },"&4Sharp&cShooter",10,4,0.16,3,1.5,0.02,5,5,5,5,0,30)
 
 
     ;
@@ -214,6 +484,11 @@ public enum MobType {
     public static MobType getMobType(LivingEntity livingEntity) {
         return livingEntity.hasMetadata("mobType") ? MobType.valueOf(livingEntity
                 .getMetadata("mobType").get(0).asString().toUpperCase()) : null;
+    }
+
+    public static MobModifierType getMobTypeModifier(LivingEntity livingEntity) {
+        return livingEntity.hasMetadata("mobTypeModifier") ? MobModifierType.valueOf(livingEntity
+                .getMetadata("mobTypeModifier").get(0).asString().toUpperCase()) : null;
     }
 
 

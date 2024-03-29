@@ -13,6 +13,8 @@ import com.SMPCore.mobs.MobTicker;
 import com.github.fierioziy.particlenativeapi.api.ParticleNativeAPI;
 import com.github.fierioziy.particlenativeapi.api.particle.type.ParticleType;
 import com.github.fierioziy.particlenativeapi.core.ParticleNativeCore;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Arrays;
@@ -56,6 +58,9 @@ public class Main extends JavaPlugin {
 
     @Override
     public void onEnable() {
+
+        Bukkit.getWorlds().forEach(world -> world.getLivingEntities().stream().filter(Entity::isCustomNameVisible)
+                .forEach(Entity::remove));
 
         Instance = this;
 
