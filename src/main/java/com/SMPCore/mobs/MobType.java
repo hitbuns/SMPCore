@@ -6,10 +6,7 @@ import com.MenuAPI.Utilities.ItemBuilder;
 import com.MenuAPI.Utils;
 import com.SMPCore.Events.TickedSMPEvent;
 import com.SMPCore.Main;
-import com.SMPCore.Utilities.CooldownHandler;
-import com.SMPCore.Utilities.MobUtils;
-import com.SMPCore.Utilities.ParticleUtils;
-import com.SMPCore.Utilities.TempEntityDataHandler;
+import com.SMPCore.Utilities.*;
 import com.SoundAnimation.SoundAPI;
 import com.mongodb.lang.Nullable;
 import org.bukkit.*;
@@ -163,7 +160,7 @@ public enum MobType {
                 double progress = (double) milliSeconds / totalTimeFrame;
                 Color color = Color.fromRGB(Math.max(0,Math.min( (int) (progress < 0.5 ? 0 : Math.round(255-(progress-0.5)*1000)),255)),
                         Math.max(0,Math.min( (int) (progress < 0.65 ? 255 : Math.round(255-(progress-0.65)*750)),255)),
-                        Math.max(0,Math.min( (int) (progress > 0.85 ? 0 : Math.round(0+(0.85-progress)*750)),255)));
+                        Math.max(0,Math.min( (int) (progress > 0.85 ? 0 : Math.round((progress-0.85)*750)),255)));
                 ParticleUtils
                         .makeCircle(location ->
                                         Main.Instance
@@ -383,19 +380,46 @@ public enum MobType {
                 Location location = livingEntity.getEyeLocation().clone().add(livingEntity.getEyeLocation().getDirection().normalize().multiply(2));
                 Main.Instance.getParticleNativeAPI().LIST_1_13.COMPOSTER.packet(true,location).sendTo(Bukkit.getOnlinePlayers());
 
-                RayTraceResult rayTraceResult = livingEntity.getWorld().rayTrace(location,livingEntity.getEyeLocation().getDirection(),radius,FluidCollisionMode.NEVER,true,1,entity ->
-                        entity == target);
 
-                if (target != null && rayTraceResult != null && rayTraceResult.getHitBlock() != null) {
+                if (target != null) {
 
-                    if (entityData.updateData("targetCounter",Integer.class,initial -> initial >= 15 ? initial+1 : -1,0) == -1) {
-                        Snowball snowball = livingEntity.launchProjectile(Snowball.class);
-                        snowball.setMetadata("damage",new LazyMetadataValue(Main.Instance, LazyMetadataValue.CacheStrategy.NEVER_CACHE,()-> 10+3*grade));
-                        snowball.setVelocity(snowball.getLocation().toVector().subtract(target.getLocation().toVector()).multiply(-2));
+                    if (target.getLocation().distance(livingEntity.getEyeLocation()) <= radius) {
+
+
+                        Location v = livingEntity.getLocation().clone();
+                        v.setYaw(180f + target.getLocation()
+                                .getYaw());
+
+                        livingEntity.teleport(v);
+
+                        RayTraceResult rayTraceResult = livingEntity.getWorld().rayTrace(location, livingEntity.getEyeLocation().getDirection(), radius, FluidCollisionMode.NEVER, true, 1, entity ->
+                                entity == target);
+                        if (!(rayTraceResult != null && rayTraceResult.getHitBlock() != null)) return;
+
+                        if (entityData.updateData("targetCounter", Integer.class, initial -> initial >= 15 ? initial + 1 : -1, 0) == -1) {
+                            Snowball snowball = livingEntity.launchProjectile(Snowball.class);
+                            snowball.setMetadata("damage", new LazyMetadataValue(Main.Instance, LazyMetadataValue.CacheStrategy.NEVER_CACHE, () -> 10 + 3 * grade));
+                            snowball.setVelocity(snowball.getLocation().toVector().subtract(target.getLocation().toVector()).multiply(-2));
+                            snowball.setMetadata("location_shot",new LazyMetadataValue(Main.Instance
+                            , LazyMetadataValue.CacheStrategy.NEVER_CACHE,() ->
+                                    livingEntity.getLocation().getWorld().getName()
+                            +"_"+livingEntity.getLocation().getX()+
+                                    "_"+livingEntity.getLocation().getY()+"_"+
+                                            livingEntity.getLocation().getZ()));
+                            new ProjectileTracker(snowball, location1 -> Main.Instance
+                                    .getParticleNativeAPI().LIST_1_13.DUST_COLOR_TRANSITION.color(Color
+                                            .fromRGB(255, 255, 255), Color
+                                            .fromRGB(30, 30, 30), 3).packet(true, location1),
+                                    50);
+                            entityData.playerCooldownHandler.setOnCoolDown("last_powerup");
+                            entityData.updateData("targetting", Player.class, initial -> null,
+                                    null);
+                            return;
+                        }
+
                         return;
-                    }
 
-                    return;
+                    }
                 }
 
                 Arrays.stream(ParticleUtils.getEntitiesInAngle(livingEntity, 15, radius)).map(livingEntity1 -> {
@@ -428,35 +452,47 @@ public enum MobType {
                     entityData.updateData("targetting",Player.class,initial -> player,null);
                 },() -> {});
 
-                return;
+                if (!entityData.playerCooldownHandler.isOnCoolDown("yaw_change",TimeUnit.SECONDS,20)) {
+
+                    entityData.playerCooldownHandler.setOnCoolDown("yaw_change");
+                    entityData.updateData("yawIncrementChange",Integer.class,initial -> 0,0);
+                    entityData.updateData("yawData",Float.class,initial -> (float) (Utils.RNGValue(-135,135)/14),livingEntity
+                            .getLocation().getYaw());
+
+                }
+
+                int i = entityData.updateData("yawIncrementChange",Integer.class,initial -> ++initial,0);
+
+                if (i <= 42 && i % 3 == 0) {
+
+                    Location location2 = livingEntity.getLocation().clone();
+                    location.setYaw(location2.getYaw()+entityData.get("yawData",Float.class,0f));
+                    livingEntity.teleport(location2);
+
+                }
 
             }
 
-            if (!entityData.playerCooldownHandler.isOnCoolDown("yaw_change",TimeUnit.SECONDS,20)) {
+        }
 
-                entityData.playerCooldownHandler.setOnCoolDown("yaw_change");
-                entityData.updateData("yawIncrementChange",Integer.class,initial -> 0,0);
-                entityData.updateData("yawData",Float.class,initial -> (float) (Utils.RNGValue(-135,135)/14),livingEntity
-                        .getLocation().getYaw());
+        if (event instanceof EntityDamageByEntityEvent entityDamageByEntityEvent && entityDamageByEntityEvent
+                .getDamager() instanceof Projectile projectile && Utils.getAttacker(projectile) == livingEntity &&
+        projectile.hasMetadata("location_shot")) {
 
-            }
+            String[] s = projectile.getMetadata("location_shot").get(0).asString().split("_");
+            Location location = new Location(Bukkit.getWorld(s[0]),
+                    Double.parseDouble(s[1]),Double.parseDouble(s[2]),
+                    Double.parseDouble(s[3]));
 
-            int i = entityData.updateData("yawIncrementChange",Integer.class,initial -> ++initial,0);
-
-            if (i <= 42 && i % 3 == 0) {
-
-                Location location = livingEntity.getLocation().clone();
-                location.setYaw(location.getYaw()+entityData.get("yawData",Float.class,0f));
-                livingEntity.teleport(location);
-
-            }
-
-
-
+            entityDamageByEntityEvent.setDamage(entityDamageByEntityEvent.getDamage()
+            *(1+0.05*location.distance(entityDamageByEntityEvent
+                    .getEntity().getLocation())));
         }
 
 
     },location -> 100,(event, livingEntity, grade) -> {
+
+
 
     },"&4Sharp&cShooter",10,4,0.16,3,1.5,0.02,5,5,5,5,0,30)
 
