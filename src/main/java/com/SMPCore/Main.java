@@ -1,15 +1,14 @@
 package com.SMPCore;
 
-import com.SMPCore.Utilities.FlagRegistryConfig;
-import com.SMPCore.Utilities.QuartzArmorHandler;
-import com.SMPCore.Utilities.TempEntityDataHandler;
-import com.SMPCore.Utilities.WorldGuardAPI;
+import com.SMPCore.Utilities.*;
 import com.SMPCore.Waypoints.WaypointListener;
 import com.SMPCore.commands.CmdClaim;
 import com.SMPCore.configs.CraftConfig;
+import com.SMPCore.configs.CraftExpConfig;
 import com.SMPCore.listeners.EventListener;
 import com.SMPCore.listeners.MobListener;
 import com.SMPCore.mobs.MobTicker;
+import com.SMPCore.skills.PlayerDataHandler;
 import com.github.fierioziy.particlenativeapi.api.ParticleNativeAPI;
 import com.github.fierioziy.particlenativeapi.api.particle.type.ParticleType;
 import com.github.fierioziy.particlenativeapi.core.ParticleNativeCore;
@@ -66,7 +65,10 @@ public class Main extends JavaPlugin {
 
         new QuartzArmorHandler(this);
 
+        PlayerDataHandler.init(this);
+
         CraftConfig.init(this);
+        CraftExpConfig.init(this);
 
         particleNativeAPI = ParticleNativeCore.loadAPI(this);
 

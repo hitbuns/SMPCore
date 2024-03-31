@@ -1,8 +1,11 @@
 package com.SMPCore.listeners;
 
 import com.MenuAPI.ItemAdder;
+import com.MenuAPI.Utilities.BukkitEventCaller;
 import com.MenuAPI.Utilities.impl.HeadUtils;
 import com.MenuAPI.Utils;
+import com.SMPCore.Events.DropTriggerEvent;
+import com.SMPCore.Utilities.CooldownHandler;
 import com.SMPCore.Utilities.TempEntityDataHandler;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -12,11 +15,14 @@ import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.world.World;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
@@ -33,6 +39,52 @@ public class EventListener implements Listener {
 //        playerJoinEvent.getPlayer().setResourcePack("https://www.dropbox.com/scl/fi/jhos5u893isxuair15gaa/quartzpack.zip?rlkey=if30890t05j20yv4yraxobnz6&dl=0");
 //
 //    }
+
+
+    @EventHandler
+    public void onDrop(PlayerDropItemEvent playerDropItemEvent) {
+
+        Player player = playerDropItemEvent.getPlayer();
+        playerDropItemEvent.setCancelled(true);
+        CooldownHandler<Entity> cooldownHandler = TempEntityDataHandler.getorAdd(player).playerCooldownHandler;
+        if (!cooldownHandler.isOnCoolDown("dropTrigger_ability_cooldown",TimeUnit.MILLISECONDS,100)) {
+            cooldownHandler.reduceCoolDown("dropTrigger_ability_cooldown",TimeUnit.MILLISECONDS,100);
+            BukkitEventCaller.callEvent(new DropTriggerEvent(player,playerDropItemEvent.getItemDrop().getItemStack()));
+        }
+
+    }
+
+    @EventHandler (priority = EventPriority.HIGHEST)
+    public void onInvDrop(InventoryClickEvent playerDropItemEvent) {
+        if (playerDropItemEvent.getAction().name().contains("DROP_")) {
+
+            boolean b = playerDropItemEvent.getAction().name()
+                    .contains("CURSOR");
+            ItemStack itemStack = b ? playerDropItemEvent.getCursor() : playerDropItemEvent
+                    .getCurrentItem(),dropped = Utils.isNullorAir(itemStack) ? null :
+                    itemStack.clone();
+
+            if (playerDropItemEvent.getAction().name().contains("ONE"))
+                dropped.setAmount(1);
+
+            itemStack.setAmount(itemStack.getAmount()-dropped.getAmount());
+
+            Item item = playerDropItemEvent.getWhoClicked().getWorld().dropItemNaturally(playerDropItemEvent
+                    .getWhoClicked().getEyeLocation(),dropped);
+            item.setVelocity(playerDropItemEvent.getWhoClicked()
+                    .getEyeLocation().getDirection().clone().normalize().multiply(0.3));
+
+            if (b) {
+                playerDropItemEvent.setCursor(itemStack.getAmount() > 0 ? itemStack :
+                        null);
+            } else playerDropItemEvent.setCurrentItem(itemStack.getAmount() > 0 ? itemStack :
+                    null);
+            playerDropItemEvent.setCancelled(true);
+
+            if (playerDropItemEvent.getWhoClicked() instanceof Player player)
+                TempEntityDataHandler.getorAdd(player).playerCooldownHandler.setOnCoolDown("dropTrigger_ability_cooldown");
+        }
+    }
 
     @EventHandler (ignoreCancelled = true,priority = EventPriority.MONITOR)
     public void onItemDamage(PlayerItemDamageEvent playerItemDamageEvent) {
