@@ -17,6 +17,5 @@ public class BonePlatingPerk extends SkillPerk {
     public void onEvent(Event event, LivingEntity livingEntity) {
 
 
-
     }
 }

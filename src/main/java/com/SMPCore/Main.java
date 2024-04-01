@@ -7,8 +7,10 @@ import com.SMPCore.configs.CraftConfig;
 import com.SMPCore.configs.CraftExpConfig;
 import com.SMPCore.listeners.EventListener;
 import com.SMPCore.listeners.MobListener;
+import com.SMPCore.mining.DurabilityListener;
 import com.SMPCore.mobs.MobTicker;
 import com.SMPCore.skills.PlayerDataHandler;
+import com.SMPCore.skills.SkillListener;
 import com.github.fierioziy.particlenativeapi.api.ParticleNativeAPI;
 import com.github.fierioziy.particlenativeapi.api.particle.type.ParticleType;
 import com.github.fierioziy.particlenativeapi.core.ParticleNativeCore;
@@ -101,6 +103,9 @@ public class Main extends JavaPlugin {
     @Override
     public void onDisable() {
 
+        if (ExecutorLimitTask.scheduledExecutorService != null) ExecutorLimitTask
+                .scheduledExecutorService.shutdownNow();
+
     }
 
     void registerCommands() {
@@ -112,6 +117,10 @@ public class Main extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new EventListener(),this);
         getServer().getPluginManager().registerEvents(new MobListener(),this);
+
+        new DurabilityListener(this);
+        getServer().getPluginManager().registerEvents(new SkillListener(),this);
+
     }
 
 }

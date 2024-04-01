@@ -39,7 +39,7 @@ public class CraftExpConfig extends Config {
 
                 if (!configurationSection.contains(key)) {
 
-                    ConfigurationSection configurationSection1 = getorAddConfigurationSection(key);
+                    ConfigurationSection configurationSection1 = getorAddConfigurationSection(configurationSection,key);
                     configurationSection1.set("expGain",0);
                     configurationSection1.set("requiredLevelCrafting",0);
 

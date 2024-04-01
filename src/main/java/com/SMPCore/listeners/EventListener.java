@@ -7,6 +7,7 @@ import com.MenuAPI.Utils;
 import com.SMPCore.Events.DropTriggerEvent;
 import com.SMPCore.Utilities.CooldownHandler;
 import com.SMPCore.Utilities.TempEntityDataHandler;
+import com.SoundAnimation.SoundAPI;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -14,6 +15,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.world.World;
 import de.tr7zw.nbtapi.NBTItem;
+import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
@@ -23,10 +25,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerItemDamageEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.concurrent.TimeUnit;
@@ -42,6 +41,23 @@ public class EventListener implements Listener {
 
 
     @EventHandler
+    public void onChat(AsyncPlayerChatEvent playerChatEvent) {
+        final String[] message = {playerChatEvent.getMessage()};
+        Player[] players = Bukkit.getOnlinePlayers().stream().filter(player -> {
+            if (message[0].contains(player.getName())) {
+                message[0] = message[0].replace(player.getName(),"@"+player.getName());
+                return true;
+            }
+
+            return false;
+        }).toArray(Player[]::new);
+
+        SoundAPI.playSound("notification_pling",players);
+        playerChatEvent.setMessage(message[0]);
+
+    }
+
+    @EventHandler (priority = EventPriority.HIGHEST)
     public void onDrop(PlayerDropItemEvent playerDropItemEvent) {
 
         Player player = playerDropItemEvent.getPlayer();
