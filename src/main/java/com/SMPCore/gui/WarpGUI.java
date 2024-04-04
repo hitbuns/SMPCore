@@ -99,7 +99,7 @@ public class WarpGUI extends AbstractModifiableListMenu<String> {
             })).setDisplayName("&eWarp: &a"+s).setLore(DescriptionBuilder
                     .init()
                             .addLore("&7Location: &a("+world.getName()+","+location.getX()+","+
-                                    location.getY()+","+location.getZ())
+                                    location.getY()+","+location.getZ()+")")
                     .build()).build(false);
             NBTItem nbtItem = new NBTItem(itemStack1);
             nbtItem.setString("warpValue",s);
