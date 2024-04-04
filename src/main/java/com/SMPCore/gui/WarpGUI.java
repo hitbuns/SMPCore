@@ -188,7 +188,7 @@ public class WarpGUI extends AbstractModifiableListMenu<String> {
         private boolean cancelled = false;
 
         public TeleportRequestHandler(Player player,String warp,Location location) {
-            super(0, 20, 7);
+            super(0, 20, Main.Instance.essentials.getConfig().getInt("teleport-delay",3));
             this.player = player;
             this.location = location;
             this.warp = warp;
