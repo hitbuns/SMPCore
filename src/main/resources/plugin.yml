@@ -10,6 +10,7 @@ depend:
   - ParticleNativeAPI
   - NBTAPI
   - SoundParticleAPI
+  - Essentials
 
 
 commands:
@@ -24,3 +25,5 @@ commands:
     usage: /waypoints
   skills:
     usage: /skills
+  warps:
+    usage: /warps

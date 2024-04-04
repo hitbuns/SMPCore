@@ -4,6 +4,7 @@ import com.SMPCore.Utilities.*;
 import com.SMPCore.Waypoints.WaypointListener;
 import com.SMPCore.commands.CmdClaim;
 import com.SMPCore.commands.CmdSkills;
+import com.SMPCore.commands.CmdWarps;
 import com.SMPCore.configs.CraftExpConfig;
 import com.SMPCore.listeners.EventListener;
 import com.SMPCore.listeners.MobListener;
@@ -11,6 +12,7 @@ import com.SMPCore.mining.DurabilityListener;
 import com.SMPCore.mobs.MobTicker;
 import com.SMPCore.skills.PlayerDataHandler;
 import com.SMPCore.skills.SkillListener;
+import com.earth2me.essentials.Essentials;
 import com.github.fierioziy.particlenativeapi.api.ParticleNativeAPI;
 import com.github.fierioziy.particlenativeapi.api.particle.type.ParticleType;
 import com.github.fierioziy.particlenativeapi.core.ParticleNativeCore;
@@ -26,6 +28,7 @@ import java.util.stream.Collectors;
 public class Main extends JavaPlugin {
     ParticleNativeAPI particleNativeAPI;
     Map<String,ParticleHolder> particleTypes;
+    public Essentials essentials;
 
     public ParticleNativeAPI getParticleNativeAPI() {
         return particleNativeAPI;
@@ -71,6 +74,9 @@ public class Main extends JavaPlugin {
 
         CraftExpConfig.init(this);
 
+        essentials = (Essentials) getServer().getPluginManager().getPlugin("Essentials");
+        essentials.getCommand("warps").setExecutor(null);
+
         particleNativeAPI = ParticleNativeCore.loadAPI(this);
 
         particleTypes = Arrays.stream(particleNativeAPI.LIST_1_13.getClass().getFields()).sorted((o1, o2) ->
@@ -110,6 +116,7 @@ public class Main extends JavaPlugin {
     void registerCommands() {
         getCommand("protectarea").setExecutor(new CmdClaim());
         getCommand("skills").setExecutor(new CmdSkills());
+        getCommand("warps").setExecutor(new CmdWarps());
     }
 
     void registerListeners() {
