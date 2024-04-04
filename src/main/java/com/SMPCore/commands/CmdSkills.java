@@ -6,6 +6,7 @@ import com.SMPCore.skills.SkillGUI;
 import com.SMPCore.skills.impl.CombatStatType;
 import com.SMPCore.skills.impl.NonCombatStatType;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -17,7 +18,7 @@ public class CmdSkills implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
 
-        Player target = strings.length > 1 ? Bukkit.getPlayer(strings[0]) : commandSender instanceof Player
+        OfflinePlayer target = strings.length > 0 ? Bukkit.getOfflinePlayer(strings[0]) : commandSender instanceof Player
                 player ? player : null;
 
         if (target == null) {
@@ -26,7 +27,7 @@ public class CmdSkills implements CommandExecutor {
         }
 
         if (!(commandSender instanceof Player player)) {
-            System.out.println();
+            System.out.println("Skill Player Profile - "+target.getName());
             for (NonCombatStatType value : NonCombatStatType.values()) {
                 System.out.println(value.name()+": Lvl. "+ PlayerDataHandler.getLevel(target,value)+" ("+
                         PlayerDataHandler.getExp(target,value, PlayerDataHandler.ExpType.CURRENT)+"/"+

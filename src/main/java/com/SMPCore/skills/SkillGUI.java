@@ -9,14 +9,15 @@ import com.MenuAPI.Utilities.FormattedNumber;
 import com.MenuAPI.Utilities.ItemBuilder;
 import com.SMPCore.skills.impl.NonCombatStatType;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 public class SkillGUI extends AbstractClickableGUI {
 
     final iPage backPage;
-    final Player player;
+    final OfflinePlayer player;
 
-    public SkillGUI(Player player,Player skillPlayer, iPage backPage) {
+    public SkillGUI(Player player, OfflinePlayer skillPlayer, iPage backPage) {
         super(player, "Skill Profile - "+player.getName(), 4, false);
         
         this.backPage = backPage;
