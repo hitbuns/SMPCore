@@ -3,7 +3,7 @@ package com.SMPCore;
 import com.SMPCore.Utilities.*;
 import com.SMPCore.Waypoints.WaypointListener;
 import com.SMPCore.commands.CmdClaim;
-import com.SMPCore.configs.CraftConfig;
+import com.SMPCore.commands.CmdSkills;
 import com.SMPCore.configs.CraftExpConfig;
 import com.SMPCore.listeners.EventListener;
 import com.SMPCore.listeners.MobListener;
@@ -69,7 +69,6 @@ public class Main extends JavaPlugin {
 
         PlayerDataHandler.init(this);
 
-        CraftConfig.init(this);
         CraftExpConfig.init(this);
 
         particleNativeAPI = ParticleNativeCore.loadAPI(this);
@@ -110,6 +109,7 @@ public class Main extends JavaPlugin {
 
     void registerCommands() {
         getCommand("protectarea").setExecutor(new CmdClaim());
+        getCommand("skills").setExecutor(new CmdSkills());
     }
 
     void registerListeners() {

@@ -17,7 +17,7 @@ public enum NonCombatStatType implements PlayerDataHandler.ExpId {
     MINING("&cMining"),
     CRAFTING("&3Crafting"),
     ENCHANTING("&4Enchanting"),
-    WORKSHOP("&dWorkshop"),
+    SMITHING("&dSmithing"),
     BARTER("&7Bartering")
     ;
 

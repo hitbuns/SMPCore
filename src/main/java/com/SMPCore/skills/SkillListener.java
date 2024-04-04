@@ -49,8 +49,8 @@ public class SkillListener implements Listener {
 
         if (expIdExpGainEvent.getOfflinePlayer() instanceof Player player)
             player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent
-                    .fromLegacyText(Utils.color("&2+"+expIdExpGainEvent.getExpAmount()+" "+expIdExpGainEvent
-                            .getExpId().getDisplay())));
+                    .fromLegacyText(Utils.color("&e+"+expIdExpGainEvent.getExpAmount()+" "+expIdExpGainEvent
+                            .getExpId().getDisplay())+" XP"));
 
     }
 

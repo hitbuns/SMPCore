@@ -60,7 +60,7 @@ public class BlockConfig extends Config {
     public boolean axe(Material material) {
         try {
             return material != null && getorAddConfigurationSection("block-dura").getConfigurationSection(material.name())
-                    .getBoolean("shovel");
+                    .getBoolean("axe");
         } catch (Exception exception) {
             create(material,true,false);
             return false;
@@ -70,7 +70,7 @@ public class BlockConfig extends Config {
     public boolean pickaxe(Material material) {
         try {
             return material != null && getorAddConfigurationSection("block-dura").getConfigurationSection(material.name())
-                    .getBoolean("shovel");
+                    .getBoolean("pickaxe");
         } catch (Exception exception) {
             create(material,true,false);
             return false;

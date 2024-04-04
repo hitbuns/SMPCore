@@ -118,8 +118,10 @@ public class BrokenBlockHandlerList {
         public void incrementDamage(Player from, double multiplier,BreakType breakType) {
             if (isBroken()) return;
 
-
-            Bukkit.broadcastMessage(damage+"_"+getAnimation()+"_"+multiplier);
+            if (System.currentTimeMillis()-lastDamage >= 1000) {
+                sendBreakPacket(0, block);
+                damage = 0;
+            }
 
             double odds = 25+0.6* (switch (breakType) {
                 case PICKAXE -> PlayerDataHandler.getLevel(from,
@@ -130,6 +132,8 @@ public class BrokenBlockHandlerList {
                 default -> -15;
             });
 
+            lastDamage = System.currentTimeMillis();
+
             if (Utils.RNG(0,100) < 100-odds) return;
 
             damage += multiplier;
@@ -138,13 +142,11 @@ public class BrokenBlockHandlerList {
             if (animation != oldAnimation) {
                 if (animation < 10) {
                     sendBreakPacket(animation,block);
-                    lastDamage = System.currentTimeMillis();
                 } else {
 
                     if (BukkitEventCaller.callEvent(new CustomBlockBreakEvent(from,block))) {
                         sendBreakPacket(0, block);
                         damage = 0;
-                        lastDamage = System.currentTimeMillis();
                         return;
                     }
 

@@ -13,6 +13,7 @@ import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.craftbukkit.v1_20_R3.entity.CraftLivingEntity;
 import org.bukkit.entity.*;
 import org.bukkit.event.Event;
 import org.bukkit.event.entity.*;
@@ -362,6 +363,7 @@ public enum MobType {
     //SKELETON
     SHARPSHOOTER(EntityType.SKELETON,(event, livingEntity) -> {
 
+
         if (event instanceof EntityShootBowEvent entityShootBowEvent) {
             entityShootBowEvent.setCancelled(true);
         }
@@ -369,6 +371,7 @@ public enum MobType {
         if (event instanceof TickedSMPEvent) {
 
             TempEntityDataHandler.EntityData entityData = TempEntityDataHandler.getorAdd(livingEntity);
+
 
             if (!entityData.playerCooldownHandler.isOnCoolDown("last_powerup",TimeUnit.SECONDS,15)) {
 
@@ -384,7 +387,6 @@ public enum MobType {
                 if (target != null) {
 
                     if (target.getLocation().distance(livingEntity.getEyeLocation()) <= radius) {
-
 
                         Location v = livingEntity.getLocation().clone();
                         v.setYaw(180f + target.getLocation()

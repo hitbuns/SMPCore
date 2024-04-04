@@ -22,3 +22,5 @@ commands:
     usage: /waypoint
   waypoints:
     usage: /waypoints
+  skills:
+    usage: /skills

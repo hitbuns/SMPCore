@@ -10,15 +10,10 @@ import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerItemHeldEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -104,23 +99,24 @@ public class DurabilityListener implements Listener {
 
         if (distanceX * distanceX + distanceY * distanceY + distanceZ * distanceZ >= 1024.0D) return;
 
-        BrokenBlockHandlerList.BrokenBlock.BreakType breakType = BrokenBlockHandlerList.BrokenBlock.ToolType.match(Utils.isNullorAir(itemStack) ? BrokenBlockHandlerList.BrokenBlock.ToolType.FIST :
+
+        BrokenBlockHandlerList.BrokenBlock.ToolType toolType = Utils.isNullorAir(itemStack) ? BrokenBlockHandlerList.BrokenBlock.ToolType.FIST :
                 itemStack.getType().name().endsWith("_PICKAXE") ? BrokenBlockHandlerList.BrokenBlock.ToolType.PICKAXE :
-                itemStack.getType().name().endsWith("_AXE") ? BrokenBlockHandlerList.BrokenBlock.ToolType.AXE : itemStack
-                        .getType().name().endsWith("_SHOVEL") ? BrokenBlockHandlerList.BrokenBlock.ToolType.SHOVEL : BrokenBlockHandlerList.BrokenBlock.ToolType.FIST,blockConfig.pickaxe(block) ? BrokenBlockHandlerList.BrokenBlock.BreakType.PICKAXE :
+                        itemStack.getType().name().endsWith("_AXE") ? BrokenBlockHandlerList.BrokenBlock.ToolType.AXE : itemStack
+                                .getType().name().endsWith("_SHOVEL") ? BrokenBlockHandlerList.BrokenBlock.ToolType.SHOVEL : BrokenBlockHandlerList.BrokenBlock.ToolType.FIST;
+
+        BrokenBlockHandlerList.BrokenBlock.BreakType breakType1 = blockConfig.pickaxe(block) ? BrokenBlockHandlerList.BrokenBlock.BreakType.PICKAXE :
                 blockConfig.axe(block) ? BrokenBlockHandlerList.BrokenBlock.BreakType.AXE : blockConfig
-                        .shovel(block) ? BrokenBlockHandlerList.BrokenBlock.BreakType.SHOVEL : BrokenBlockHandlerList.BrokenBlock.BreakType.NONE);
+                        .shovel(block) ? BrokenBlockHandlerList.BrokenBlock.BreakType.SHOVEL : BrokenBlockHandlerList.BrokenBlock.BreakType.NONE;
+
+        BrokenBlockHandlerList.BrokenBlock.BreakType breakType = BrokenBlockHandlerList.BrokenBlock.ToolType.match(toolType,breakType1);
 
 
         EquipmentHandler.Material material = null;
 
         try {
-            System.out.println("TESFE+!_1");
             material = EquipmentHandler.Material.valueOf(itemStack.getType().name().split("_")[0]);
-            System.out.println("TESFE+!_2");
-        } catch (Exception exception) {
-            System.out.println("TESFE+!_ERROR");
-            exception.printStackTrace();
+        } catch (Exception ignored) {
         }
 
         double multiplier = (1 + (breakType != BrokenBlockHandlerList.BrokenBlock.BreakType.NONE ? switch (material) {
