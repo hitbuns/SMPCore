@@ -147,6 +147,7 @@ public class WarpGUI extends AbstractModifiableListMenu<String> {
                     Location location = Main.Instance.essentials.getWarps().getWarp(s).getBlock().getLocation().clone();
                     location.setY(location.getY()+1);
                     new TeleportRequestHandler(getPlayer(),s,location);
+                    close(getPlayer());
                 } catch (WarpNotFoundException | InvalidWorldException e) {
                     throw new RuntimeException(e);
                 }
@@ -198,7 +199,8 @@ public class WarpGUI extends AbstractModifiableListMenu<String> {
             this.cancelled =cancelled;
             if (cancelled) {
                 setCountMax(getCountMax());
-                this.player.sendMessage(Utils.color("&cTeleport was cancelled!"));
+                player.sendMessage(Utils.color("&cTeleport was cancelled!"));
+                player.sendTitle(null,Utils.color("&cTeleport was cancelled!"),10,30,10);
             }
         }
 

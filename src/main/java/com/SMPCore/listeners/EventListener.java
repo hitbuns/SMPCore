@@ -7,6 +7,7 @@ import com.MenuAPI.Utils;
 import com.SMPCore.Events.DropTriggerEvent;
 import com.SMPCore.Utilities.CooldownHandler;
 import com.SMPCore.Utilities.TempEntityDataHandler;
+import com.SMPCore.gui.WarpGUI;
 import com.SoundAnimation.SoundAPI;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -16,6 +17,7 @@ import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.world.World;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
@@ -113,6 +115,28 @@ public class EventListener implements Listener {
 
         if (nbtItem.getInteger("CustomModelData") == 12925)
             playerItemDamageEvent.setDamage((int) Math.round(playerItemDamageEvent.getDamage()*0.1));
+    }
+
+
+    @EventHandler
+    public void onWarpCheckMove(PlayerMoveEvent playerMoveEvent) {
+
+        TempEntityDataHandler.EntityData entityData = TempEntityDataHandler.getorAdd(playerMoveEvent.getPlayer());
+        WarpGUI.TeleportRequestHandler teleportRequestHandler = entityData.get("teleportRequest", WarpGUI.TeleportRequestHandler.class,null);
+
+        if (teleportRequestHandler == null) return;
+
+        Location from = playerMoveEvent.getFrom(), to = playerMoveEvent
+                .getTo();
+
+        if (from.getX() != to.getX() || from.getY() != to.getY() || from.getZ() !=
+        to.getZ()) {
+
+            teleportRequestHandler.setCancelled(true);
+            entityData.updateData("teleportRequest", WarpGUI.TeleportRequestHandler.class,initial -> null,null);
+
+        }
+
     }
 
     @EventHandler
