@@ -21,30 +21,34 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Arrays;
+
 public class WarpGUI extends AbstractModifiableListMenu<String> {
 
-    static String[] warps;
+    String[] warps;
 
     public WarpGUI(Player player,  iPage backPage) {
         super(player, "Warps", backPage, 4, String.class);
 
-        if (warps == null) warps = Main.Instance.essentials.getWarps().getList().stream().sorted((o1, o2) -> {
+
+
+        this.warps = Main.Instance.essentials.getWarps().getList().stream().filter(s -> getPlayer().hasPermission("essentials.warps."+s)).sorted((o1, o2) -> {
             try {
                 World.Environment environment1 = Main.Instance.essentials.getWarps().getWarp(o1).getWorld().getEnvironment(),
                         environment2 = Main.Instance.essentials.getWarps().getWarp(o2).getWorld().getEnvironment();
 
                 return Integer.compare(
                         switch (environment1) {
-                            case NORMAL -> 0;
-                            case CUSTOM -> -1;
-                            case NETHER -> -2;
-                            case THE_END -> -3;
+                            case NORMAL -> -3;
+                            case CUSTOM -> -2;
+                            case NETHER -> -1;
+                            case THE_END -> 0;
                         },
                         switch (environment2) {
-                            case NORMAL -> 0;
-                            case CUSTOM -> -1;
-                            case NETHER -> -2;
-                            case THE_END -> -3;
+                            case NORMAL -> -3;
+                            case CUSTOM -> -2;
+                            case NETHER -> -1;
+                            case THE_END -> 0;
                         }
                 );
             } catch (WarpNotFoundException | InvalidWorldException e) {

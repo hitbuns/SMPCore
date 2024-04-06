@@ -2,10 +2,12 @@ package com.SMPCore.skills;
 
 import com.MenuAPI.Utils;
 import com.SMPCore.Events.ExpIdExpGainEvent;
+import com.SMPCore.Events.ExpIdLevelUpEvent;
 import com.SMPCore.mining.CustomBlockBreakEvent;
 import com.SMPCore.skills.impl.NonCombatStatType;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -49,8 +51,22 @@ public class SkillListener implements Listener {
 
         if (expIdExpGainEvent.getOfflinePlayer() instanceof Player player)
             player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent
-                    .fromLegacyText(Utils.color("&e+"+expIdExpGainEvent.getExpAmount()+" "+expIdExpGainEvent
-                            .getExpId().getDisplay())+" XP"));
+                    .fromLegacyText(Utils.color("&8&m===&e +"+expIdExpGainEvent.getExpAmount()+" "+ ChatColor.stripColor(expIdExpGainEvent
+                            .getExpId().getDisplay())+" XP &8&m===").replace(".0 "," ")));
+
+    }
+
+
+    @EventHandler (ignoreCancelled = true,priority = EventPriority.MONITOR)
+    public void onSkillLevelIncrease(ExpIdLevelUpEvent expIdLevelUpEvent) {
+
+        if (expIdLevelUpEvent.getOfflinePlayer() instanceof Player player) {
+
+            player.sendTitle(Utils.color("&8&m   &e "+expIdLevelUpEvent.getExpId().getDisplay()+" Level Up &8&m   "),
+                    Utils.color("&bLvl. &e&m"+expIdLevelUpEvent
+                            .getPreviousLevel()+"&b ➪ &a"+expIdLevelUpEvent.getNewLevel()),5,45,15);
+
+        }
 
     }
 

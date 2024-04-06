@@ -129,13 +129,24 @@ public class EventListener implements Listener {
         Location from = playerMoveEvent.getFrom(), to = playerMoveEvent
                 .getTo();
 
-        if (from.getX() != to.getX() || from.getY() != to.getY() || from.getZ() !=
-        to.getZ()) {
+        if (from.getBlockX() != to.getBlockX() || from.getBlockY() != to.getBlockY() || from.getBlockZ() != to.getBlockZ()) {
 
             teleportRequestHandler.setCancelled(true);
             entityData.updateData("teleportRequest", WarpGUI.TeleportRequestHandler.class,initial -> null,null);
 
         }
+
+    }
+
+    @EventHandler (ignoreCancelled = true,priority = EventPriority.MONITOR)
+    public void onTeleport(PlayerTeleportEvent playerTeleportEvent) {
+
+        TempEntityDataHandler.EntityData entityData = TempEntityDataHandler.getorAdd(playerTeleportEvent.getPlayer());
+        WarpGUI.TeleportRequestHandler teleportRequestHandler = entityData.get("teleportRequest", WarpGUI.TeleportRequestHandler.class,null);
+
+        if (teleportRequestHandler == null) return;
+
+        entityData.updateData("teleportRequest", WarpGUI.TeleportRequestHandler.class,initial -> null,null);
 
     }
 
