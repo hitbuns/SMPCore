@@ -25,14 +25,13 @@ import java.util.Arrays;
 
 public class WarpGUI extends AbstractModifiableListMenu<String> {
 
+    static String[] warps1;
     String[] warps;
 
     public WarpGUI(Player player,  iPage backPage) {
         super(player, "Warps", backPage, 4, String.class);
 
-
-
-        this.warps = Main.Instance.essentials.getWarps().getList().stream().filter(s -> getPlayer().hasPermission("essentials.warps."+s)).sorted((o1, o2) -> {
+        if (warps1 == null || warps1.length != Main.Instance.essentials.getWarps().getCount()) warps1 = Main.Instance.essentials.getWarps().getList().stream().sorted((o1, o2) -> {
             try {
                 World.Environment environment1 = Main.Instance.essentials.getWarps().getWarp(o1).getWorld().getEnvironment(),
                         environment2 = Main.Instance.essentials.getWarps().getWarp(o2).getWorld().getEnvironment();
@@ -55,6 +54,8 @@ public class WarpGUI extends AbstractModifiableListMenu<String> {
                 return -3;
             }
         }).toArray(String[]::new);
+
+        this.warps = Arrays.stream(warps1).filter(s -> getPlayer().hasPermission("essentials.warps."+s)).toArray(String[]::new);
 
         TempEntityDataHandler.EntityData entityData = TempEntityDataHandler.getorAdd(player);
 
