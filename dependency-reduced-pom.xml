@@ -246,6 +246,13 @@
       <scope>system</scope>
       <systemPath>${project.basedir}/lib/bundler/libraries/bungeecord-chat-1.16-R0.4.jar</systemPath>
     </dependency>
+    <dependency>
+      <groupId>local.dependency</groupId>
+      <artifactId>CustomCrafting</artifactId>
+      <version>1.0</version>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/lib/CustomCrafting-1.4.jar</systemPath>
+    </dependency>
   </dependencies>
   <properties>
     <maven.compiler.target>17</maven.compiler.target>

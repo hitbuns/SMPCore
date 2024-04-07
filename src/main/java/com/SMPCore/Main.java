@@ -69,7 +69,7 @@ public class Main extends JavaPlugin {
 
         Instance = this;
 
-        new QuartzArmorHandler(this);
+        //new QuartzArmorHandler(this);
 
         PlayerDataHandler.init(this);
 

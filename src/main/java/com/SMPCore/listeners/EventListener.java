@@ -1,5 +1,7 @@
 package com.SMPCore.listeners;
 
+import be.razerstorm.customcrafting.events.PushRecipeToServerEvent;
+import be.razerstorm.customcrafting.events.RecipeRemoveEvent;
 import com.MenuAPI.ItemAdder;
 import com.MenuAPI.Utilities.BukkitEventCaller;
 import com.MenuAPI.Utilities.impl.HeadUtils;
@@ -7,6 +9,7 @@ import com.MenuAPI.Utils;
 import com.SMPCore.Events.DropTriggerEvent;
 import com.SMPCore.Utilities.CooldownHandler;
 import com.SMPCore.Utilities.TempEntityDataHandler;
+import com.SMPCore.configs.CraftExpConfig;
 import com.SMPCore.gui.WarpGUI;
 import com.SoundAnimation.SoundAPI;
 import com.sk89q.worldedit.LocalSession;
@@ -19,6 +22,7 @@ import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -28,6 +32,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.CraftingRecipe;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.concurrent.TimeUnit;
@@ -218,9 +223,41 @@ public class EventListener implements Listener {
     }
 
     @EventHandler
-    public void onJoin(PlayerJoinEvent playerJoinEvent) {
-        ItemAdder.addItem(playerJoinEvent
-                .getPlayer(), HeadUtils.getItemHead("http://textures.minecraft.net/texture/dd4226d3d5b102c0ee4bac7d8db599177c9a4ce7bb45bb47faf67fe0c543bd04"));
+    public void onRecipeCreate(PushRecipeToServerEvent pushRecipeToServerEvent) {
+        if (pushRecipeToServerEvent.recipe instanceof CraftingRecipe recipe) {
+
+
+            ConfigurationSection configurationSection = CraftExpConfig.Instance.getorAddConfigurationSection("crafts");
+
+            String key = recipe.getKey().getKey();
+
+            if (!configurationSection.contains(key)) {
+
+                ConfigurationSection configurationSection1 = CraftExpConfig.Instance.getorAddConfigurationSection(configurationSection,key);
+                configurationSection1.set("expGain",0);
+                configurationSection1.set("requiredLevelCrafting",0);
+                CraftExpConfig.Instance.save();
+            }
+
+
+        }
+    }
+
+    @EventHandler
+    public void onRecipeRemove(RecipeRemoveEvent recipeRemoveEvent) {
+
+        if (recipeRemoveEvent.recipe instanceof CraftingRecipe recipe) {
+
+
+            ConfigurationSection configurationSection = CraftExpConfig.Instance.getorAddConfigurationSection("crafts");
+
+            String key = recipe.getKey().getKey();
+
+            configurationSection.set(key,null);
+            CraftExpConfig.Instance.save();
+
+
+        }
     }
 
 }
