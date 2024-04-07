@@ -1,5 +1,6 @@
 package com.SMPCore;
 
+import be.razerstorm.customcrafting.CustomCrafting;
 import com.SMPCore.Utilities.*;
 import com.SMPCore.Waypoints.WaypointListener;
 import com.SMPCore.commands.CmdClaim;
