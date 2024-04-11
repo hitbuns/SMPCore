@@ -21,7 +21,7 @@ public class HastenedPerk extends AbilitySkillPerk {
 
     public HastenedPerk() {
         super(NonCombatStatType.MINING, offlinePlayer -> PlayerDataHandler.getLevel(offlinePlayer,
-                NonCombatStatType.MINING) >= 10);
+                NonCombatStatType.MINING) >= 10 ? null : "&cYou are required to be at least Lvl. 10 Mining to use this perk!");
     }
 
     @Override
@@ -56,4 +56,8 @@ public class HastenedPerk extends AbilitySkillPerk {
     }
 
 
+    @Override
+    public String getDisplayName() {
+        return "&eHast&6ened";
+    }
 }

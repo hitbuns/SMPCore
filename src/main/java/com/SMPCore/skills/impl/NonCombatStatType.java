@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum NonCombatStatType implements PlayerDataHandler.ExpId {
+public enum NonCombatStatType implements PlayerDataHandler.ExpId,iPerkContainer {
 
     FARMING("&bFarming"),
     COOKING("&aCooking"),
@@ -66,5 +66,10 @@ public enum NonCombatStatType implements PlayerDataHandler.ExpId {
     @Override
     public String getDisplay() {
         return displayKey;
+    }
+
+    @Override
+    public Map<String, SkillPerk> getPerks() {
+        return allPerks;
     }
 }

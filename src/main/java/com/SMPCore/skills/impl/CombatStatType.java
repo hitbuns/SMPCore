@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum CombatStatType implements PlayerDataHandler.ExpId {
+public enum CombatStatType implements PlayerDataHandler.ExpId,iPerkContainer {
 
     STRENGTH("&cStrength"),
     DEXTERITY("&aDexterity"),
@@ -63,4 +63,8 @@ public enum CombatStatType implements PlayerDataHandler.ExpId {
         return displayKey;
     }
 
+    @Override
+    public Map<String, SkillPerk> getPerks() {
+        return allPerks;
+    }
 }

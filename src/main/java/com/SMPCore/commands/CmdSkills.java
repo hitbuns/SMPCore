@@ -2,7 +2,7 @@ package com.SMPCore.commands;
 
 import com.MenuAPI.Utils;
 import com.SMPCore.skills.PlayerDataHandler;
-import com.SMPCore.skills.SkillGUI;
+import com.SMPCore.skills.gui.SkillGUI;
 import com.SMPCore.skills.impl.CombatStatType;
 import com.SMPCore.skills.impl.NonCombatStatType;
 import org.bukkit.Bukkit;

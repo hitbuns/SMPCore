@@ -1,4 +1,4 @@
-package com.SMPCore.skills;
+package com.SMPCore.skills.gui;
 
 import com.MenuAPI.GUISystem.AbstractClickableGUI;
 import com.MenuAPI.GUISystem.Button;
@@ -7,6 +7,7 @@ import com.MenuAPI.Utilities.DecorationUtils;
 import com.MenuAPI.Utilities.DescriptionBuilder;
 import com.MenuAPI.Utilities.FormattedNumber;
 import com.MenuAPI.Utilities.ItemBuilder;
+import com.SMPCore.skills.PlayerDataHandler;
 import com.SMPCore.skills.impl.NonCombatStatType;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -56,7 +57,7 @@ public class SkillGUI extends AbstractClickableGUI {
         DecorationUtils.fillItem(getInventory(),Material.GRAY_STAINED_GLASS_PANE);
 
         getInventory().setItem(11,new ItemBuilder(Material.STONE_HOE)
-                .setDisplayName("&aFarming Lvl. &b"+PlayerDataHandler.getLevel(player, NonCombatStatType.FARMING)).setGlowing(true).setLore(DescriptionBuilder.init()
+                .setDisplayName("&aFarming Lvl. &b"+ PlayerDataHandler.getLevel(player, NonCombatStatType.FARMING)).setGlowing(true).setLore(DescriptionBuilder.init()
                         .addLore("&7("+
                                 FormattedNumber.getInstance().getCommaFormattedNumber(PlayerDataHandler
                                         .getExp(player,NonCombatStatType.FARMING, PlayerDataHandler.ExpType.CURRENT),1)+"/"+
