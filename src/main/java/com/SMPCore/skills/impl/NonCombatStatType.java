@@ -36,8 +36,11 @@ public enum NonCombatStatType implements PlayerDataHandler.ExpId,iPerkContainer 
 
                     try {
 
-                        combatStatType.allPerks.put(aClass.getSimpleName(),aClass
-                                .getDeclaredConstructor().newInstance());
+                        SkillPerk skillPerk = aClass
+                                .getDeclaredConstructor().newInstance();
+                        combatStatType.allPerks.put(aClass.getSimpleName(),skillPerk);
+                        if (AbilityIntentionType.allPerks == null) AbilityIntentionType.allPerks = new HashMap<>();
+                        AbilityIntentionType.allPerks.put(aClass.getSimpleName(),skillPerk);
 
                     } catch (Exception exception) {
                         System.out.println("["+combatStatType.name()+"]StatType Skill Perk must have a no-args constructor!");

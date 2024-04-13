@@ -26,21 +26,26 @@ public class SkillListener implements Listener {
         if (customBlockBreakEvent.isCancelled()) return;
 
         Material material = customBlockBreakEvent.block.getType();
-        ItemStack itemStack = customBlockBreakEvent.player.getInventory().getItemInMainHand();
-        World world = customBlockBreakEvent.player.getWorld();
-        (Utils.isNullorAir( itemStack) ? customBlockBreakEvent.block.getDrops() : customBlockBreakEvent
-                .block.getDrops(itemStack,customBlockBreakEvent.player)).stream().filter(Objects::nonNull).forEach(itemStack1 ->
-                world.dropItemNaturally(customBlockBreakEvent.block.getLocation(),itemStack1.clone()));
+//        ItemStack itemStack = customBlockBreakEvent.player.getInventory().getItemInMainHand();
+//        World world = customBlockBreakEvent.player.getWorld();
+
+//        customBlockBreakEvent.setCancelled(true);
+//        customBlockBreakEvent.block.setType(Material.AIR);
+//
+//        (Utils.isNullorAir( itemStack) ? customBlockBreakEvent.block.getDrops(itemStack) : customBlockBreakEvent
+//                .block.getDrops(itemStack,customBlockBreakEvent.player)).stream().filter(Objects::nonNull).forEach(itemStack1 ->
+//                world.dropItemNaturally(customBlockBreakEvent.block.getLocation(),itemStack1.clone()));
 
         if (material.name().endsWith("_ORE"))
             PlayerDataHandler.addExp(customBlockBreakEvent.player, NonCombatStatType.MINING,ExpReason.GRIND,switch (material) {
-                case COAL_ORE,DEEPSLATE_COAL_ORE -> 5;
-                case COPPER_ORE,DEEPSLATE_COPPER_ORE -> 3;
-                case GOLD_ORE,DEEPSLATE_GOLD_ORE,NETHER_GOLD_ORE -> 30;
-                case REDSTONE_ORE,DEEPSLATE_REDSTONE_ORE -> 8;
-                case LAPIS_ORE,DEEPSLATE_LAPIS_ORE -> 10;
-                case EMERALD_ORE,DEEPSLATE_EMERALD_ORE -> 15;
-                case DIAMOND_ORE,DEEPSLATE_DIAMOND_ORE -> 50;
+                case COAL_ORE,DEEPSLATE_COAL_ORE -> 30;
+                case COPPER_ORE,DEEPSLATE_COPPER_ORE -> 18;
+                case GOLD_ORE,DEEPSLATE_GOLD_ORE,NETHER_GOLD_ORE -> 180;
+                case REDSTONE_ORE,DEEPSLATE_REDSTONE_ORE -> 48;
+                case LAPIS_ORE,DEEPSLATE_LAPIS_ORE -> 60;
+                case EMERALD_ORE,DEEPSLATE_EMERALD_ORE -> 90;
+                case DIAMOND_ORE,DEEPSLATE_DIAMOND_ORE -> 300;
+                case STONE,COBBLESTONE -> 1;
                 default -> 0;
             });
 

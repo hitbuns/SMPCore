@@ -1,6 +1,10 @@
 package com.SMPCore.skills.impl;
 
 import com.SMPCore.skills.PlayerDataHandler;
+import com.SMPCore.skills.SkillPerk;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public enum AbilityIntentionType {
 
@@ -20,5 +24,7 @@ public enum AbilityIntentionType {
     }
 
     public final PlayerDataHandler.ExpId[] expIds;
+
+    public static Map<String, SkillPerk> allPerks = new HashMap<>();
 
 }

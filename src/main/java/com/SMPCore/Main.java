@@ -10,8 +10,10 @@ import com.SMPCore.listeners.EventListener;
 import com.SMPCore.listeners.MobListener;
 import com.SMPCore.mining.DurabilityListener;
 import com.SMPCore.mobs.MobTicker;
+import com.SMPCore.skills.AbilityMessageConfig;
 import com.SMPCore.skills.PlayerDataHandler;
 import com.SMPCore.skills.SkillListener;
+import com.SMPCore.skills.impl.AbilityIntentionType;
 import com.earth2me.essentials.Essentials;
 import com.github.fierioziy.particlenativeapi.api.ParticleNativeAPI;
 import com.github.fierioziy.particlenativeapi.api.particle.type.ParticleType;
@@ -98,6 +100,9 @@ public class Main extends JavaPlugin {
 
 
         new MobTicker();
+
+        AbilityMessageConfig.init(this);
+
 
         registerCommands();
         registerListeners();

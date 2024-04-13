@@ -7,10 +7,15 @@ import com.MenuAPI.Utilities.BukkitEventCaller;
 import com.MenuAPI.Utilities.impl.HeadUtils;
 import com.MenuAPI.Utils;
 import com.SMPCore.Events.DropTriggerEvent;
+import com.SMPCore.Events.TickedSMPEvent;
 import com.SMPCore.Utilities.CooldownHandler;
 import com.SMPCore.Utilities.TempEntityDataHandler;
 import com.SMPCore.configs.CraftExpConfig;
 import com.SMPCore.gui.WarpGUI;
+import com.SMPCore.skills.AbilitySkillPerk;
+import com.SMPCore.skills.PlayerDataHandler;
+import com.SMPCore.skills.SkillPerk;
+import com.SMPCore.skills.impl.AbilityIntentionType;
 import com.SoundAnimation.SoundAPI;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -21,7 +26,13 @@ import com.sk89q.worldedit.world.World;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarFlag;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
@@ -30,6 +41,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.CraftingRecipe;
@@ -63,6 +75,7 @@ public class EventListener implements Listener {
         playerChatEvent.setMessage(message[0]);
 
     }
+
 
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onDrop(PlayerDropItemEvent playerDropItemEvent) {
@@ -259,5 +272,64 @@ public class EventListener implements Listener {
 
         }
     }
+
+
+    @EventHandler (ignoreCancelled = true,priority = EventPriority.MONITOR)
+    public void onDropTriggerEvent(DropTriggerEvent dropTriggerEvent) {
+
+        ItemStack itemStack = dropTriggerEvent.getItemStack();
+
+        if (Utils.isNullorAir( itemStack)) return;
+        Player player = dropTriggerEvent.getPlayer();
+        boolean sneak = player.isSneaking();
+
+        AbilityIntentionType abilityIntentionType = getAbilityIntentionType(itemStack);
+
+        if (abilityIntentionType == null) return;
+
+        if (AbilityIntentionType.allPerks.get(PlayerDataHandler.getPlayerData(player).getString("ability_"+abilityIntentionType
+                .name()+"_"+(sneak ? "SECONDARY" : "PRIMARY")))  instanceof AbilitySkillPerk abilitySkillPerk) {
+
+            abilitySkillPerk.onAbilityActivate(dropTriggerEvent,player,!sneak);
+
+        }
+
+    }
+
+    private static AbilityIntentionType getAbilityIntentionType(ItemStack itemStack) {
+        String material = itemStack.getType().name();
+
+        AbilityIntentionType abilityIntentionType = material.contains("_PICKAXE") ? AbilityIntentionType.MINING : material.contains("_AXE") ?
+                AbilityIntentionType.AXE : material.contains("_SWORD") ? AbilityIntentionType.SWORD : material.contains("_HOE") ? AbilityIntentionType.FARMING :
+                itemStack.getType() == Material.BOW || itemStack.getType() == Material.CROSSBOW ? AbilityIntentionType.RANGED_COMBAT : itemStack.getType() == Material.ENCHANTED_BOOK ?
+                        AbilityIntentionType.ENCHANTING : null;
+        return abilityIntentionType;
+    }
+
+    @EventHandler
+    public void onTick(TickedSMPEvent tickedSMPEvent) {
+
+        Bukkit.getOnlinePlayers().forEach(player -> {
+
+
+        });
+
+    }
+
+
+    static BossBar getorAddBossBar(Player player) {
+        NamespacedKey namespacedKey = NamespacedKey.minecraft("bossbar"+String.valueOf(player.getUniqueId()).replace("_",""));
+        BossBar bossBar = Bukkit.getBossBar(namespacedKey);
+
+        if (bossBar == null) {
+            bossBar = Bukkit.createBossBar(namespacedKey,
+                    "&eRage: ", BarColor.GREEN, BarStyle.SEGMENTED_6, BarFlag.CREATE_FOG);
+        }
+
+        if (!bossBar.getPlayers().contains(player)) bossBar.addPlayer(player);
+
+        return bossBar;
+    }
+
 
 }

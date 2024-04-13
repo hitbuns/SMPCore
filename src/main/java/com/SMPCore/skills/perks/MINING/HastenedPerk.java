@@ -21,19 +21,28 @@ public class HastenedPerk extends AbilitySkillPerk {
 
     public HastenedPerk() {
         super(NonCombatStatType.MINING, offlinePlayer -> PlayerDataHandler.getLevel(offlinePlayer,
-                NonCombatStatType.MINING) >= 10 ? null : "&cYou are required to be at least Lvl. 10 Mining to use this perk!");
+                NonCombatStatType.MINING) >= 10 ? null : "&4[SkillsAPI] &eYou are required to be at least Lvl. &a10 Mining to use this perk!");
     }
 
     @Override
-    public void onSpawn(DropTriggerEvent event, LivingEntity livingEntity, int grade) {
+    public void onEvent(Event event, LivingEntity livingEntity) {
 
-        ItemStack itemStack = event.getItemStack();
+    }
+
+
+    @Override
+    public String getDisplayName() {
+        return "&eHast&6ened";
+    }
+
+    @Override
+    public void onAbilityActivate(DropTriggerEvent dropTriggerEvent, Player player, boolean primary) {
+        ItemStack itemStack = dropTriggerEvent.getItemStack();
         if (Utils.isNullorAir(itemStack) || !itemStack.getType().name().contains("PICKAXE")) return;
 
-        Player player = event.getPlayer();
 
         if (!playerPredicate.test(player)) {
-            player.sendMessage(Utils.color("&4[!] &eYou must be at least &aLvl. 10 Mining&e before you can use this!"));
+            player.sendMessage(Utils.color(playerPredicate.message(player)));
             return;
         }
 
@@ -47,17 +56,5 @@ public class HastenedPerk extends AbilitySkillPerk {
             player.playEffect(EntityEffect.FIREWORK_EXPLODE);
 
         }
-
-    }
-
-    @Override
-    public void onEvent(Event event, LivingEntity livingEntity) {
-
-    }
-
-
-    @Override
-    public String getDisplayName() {
-        return "&eHast&6ened";
     }
 }
