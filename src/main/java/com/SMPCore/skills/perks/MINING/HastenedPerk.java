@@ -39,18 +39,14 @@ public class HastenedPerk extends AbilitySkillPerk {
     public void onAbilityActivate(DropTriggerEvent dropTriggerEvent, Player player, boolean primary) {
         ItemStack itemStack = dropTriggerEvent.getItemStack();
 
-        //System.out.println("ABILITY_TEST_ACTIVATE_HASTENED_1");
         if (Utils.isNullorAir(itemStack) || !itemStack.getType().name().contains("PICKAXE")) return;
 
-        //System.out.println("ABILITY_TEST_ACTIVATE_HASTENED_2");
 
         if (!playerPredicate.test(player)) {
-            //System.out.println("ABILITY_TEST_ACTIVATE_HASTENED_3");
             player.sendMessage(Utils.color(playerPredicate.message(player)));
             return;
         }
 
-        //System.out.println("ABILITY_TEST_ACTIVATE_HASTENED_4");
 
         TempEntityDataHandler.EntityData entityData = TempEntityDataHandler.getorAdd(player);
 
@@ -62,7 +58,6 @@ public class HastenedPerk extends AbilitySkillPerk {
 
         if (!entityData.playerCooldownHandler.isOnCoolDown("hastened_perk", TimeUnit.SECONDS, 15)) {
 
-            //System.out.println("ABILITY_TEST_ACTIVATE_HASTENED_5");
 
             player.addPotionEffect(PotionEffectType.FAST_DIGGING.createEffect(Math.floorDiv(PlayerDataHandler.getLevel(player,
                     NonCombatStatType.MINING),30),300));
@@ -70,6 +65,7 @@ public class HastenedPerk extends AbilitySkillPerk {
             player.playEffect(EntityEffect.FIREWORK_EXPLODE);
 
             entityData.playerCooldownHandler.setOnCoolDown("hastened_perk");
+            entityData.updateData("rageCurrent",Double.class,initial -> 0D,0D);
             return;
         }
 
@@ -77,6 +73,5 @@ public class HastenedPerk extends AbilitySkillPerk {
         player.spigot().sendMessage(ChatMessageType.ACTION_BAR,TextComponent.fromLegacyText(Utils.color("&4[!] &eHastened is currently on cooldown for another "+
                 entityData.playerCooldownHandler.cooldownLeftDHMS("hastened_perk",TimeUnit.SECONDS,15))));
 
-        //System.out.println("ABILITY_TEST_ACTIVATE_HASTENED_6");
     }
 }
