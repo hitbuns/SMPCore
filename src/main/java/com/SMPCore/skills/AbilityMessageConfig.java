@@ -20,24 +20,45 @@ public class AbilityMessageConfig extends Config {
         super(javaPlugin, javaPlugin.getDataFolder(), "ability-message.yml");
 
         ConfigurationSection configurationSection = getorAddConfigurationSection("descriptions");
-
+        System.out.println("FULL_DEBUG_1");
         for (CombatStatType value : CombatStatType.values()) {
-            value.allPerks.forEach((s, skillPerk) -> {
-                if (!configurationSection.contains(s)) {
-                    configurationSection.set(s, List.of("&eThis is an ability!"));
-                }
-            });
+            System.out.println("FULL_DEBUG_2_"+value.name());
+            try {
+                System.out.println("LIST_SIZE>>"+value.allPerks.size());
+                value.allPerks.forEach((s, skillPerk) -> {
+                    System.out.println("CHECK SKILL DESCRIPTION>> " + s);
+                    if (!configurationSection.contains(s)) {
+                        System.out.println("GENERATE SKILL DESCRIPTION>> " + s);
+                        configurationSection.set(s, Arrays.asList("&eThis is an ability!"));
+                    }
+                });
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
         }
 
+        System.out.println("FULL_DEBUG_3");
         for (NonCombatStatType value : NonCombatStatType.values()) {
-            value.allPerks.forEach((s, skillPerk) -> {
-                if (!configurationSection.contains(s)) {
-                    configurationSection.set(s, List.of("&eThis is an ability!"));
-                }
-            });
+            System.out.println("FULL_DEBUG_4_"+value.name());
+            try {
+                System.out.println("LIST_SIZE>>"+value.allPerks.size());
+                value.allPerks.forEach((s, skillPerk) -> {
+                    System.out.println("CHECK SKILL DESCRIPTION>> "+s);
+                    if (!configurationSection.contains(s)) {
+                        System.out.println("GENERATE SKILL DESCRIPTION>> "+s);
+                        configurationSection.set(s, Arrays.asList("&eThis is an ability!"));
+                    }
+                });
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
         }
+
+        System.out.println("FULL_DEBUG_5");
 
         save();
+
+        System.out.println("FULL_DEBUG_6");
 
 
     }

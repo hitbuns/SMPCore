@@ -26,22 +26,27 @@ public enum NonCombatStatType implements PlayerDataHandler.ExpId,iPerkContainer 
         this.displayKey = displayKey;
     }
 
-    static {
+    public static void init() {
+        System.out.println("DEBUG_13_A");
         Arrays.stream(NonCombatStatType.values()).forEach(combatStatType -> {
 
+            System.out.println("DEBUG_13_1");
             try {
 
-                Reflections reflections= new Reflections("com.SMPCore.perks."+combatStatType.name());
+                System.out.println("DEBUG_13_2");
+                Reflections reflections= new Reflections("com.SMPCore.skills.perks."+combatStatType.name());
                 reflections.getSubTypesOf(SkillPerk.class).forEach(aClass -> {
 
                     try {
 
+                        System.out.println("DEBUG_13_3");
                         SkillPerk skillPerk = aClass
                                 .getDeclaredConstructor().newInstance();
                         combatStatType.allPerks.put(aClass.getSimpleName(),skillPerk);
-                        if (AbilityIntentionType.allPerks == null) AbilityIntentionType.allPerks = new HashMap<>();
+//                        if (AbilityIntentionType.allPerks == null) AbilityIntentionType.allPerks = new HashMap<>();
                         AbilityIntentionType.allPerks.put(aClass.getSimpleName(),skillPerk);
 
+                        System.out.println("DEBUG_13_4");
                     } catch (Exception exception) {
                         System.out.println("["+combatStatType.name()+"]StatType Skill Perk must have a no-args constructor!");
                         throw new RuntimeException(exception);
@@ -55,6 +60,7 @@ public enum NonCombatStatType implements PlayerDataHandler.ExpId,iPerkContainer 
             }
 
         });
+        System.out.println("DEBUG_13_B");
     }
 
 

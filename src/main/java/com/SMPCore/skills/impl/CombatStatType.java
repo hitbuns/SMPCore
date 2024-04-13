@@ -22,23 +22,28 @@ public enum CombatStatType implements PlayerDataHandler.ExpId,iPerkContainer {
         this.displayKey = displayKey;
     }
 
-    static {
+    public static void init() {
+        System.out.println("DEBUG_12_A");
         Arrays.stream(CombatStatType.values()).forEach(combatStatType -> {
-
+            System.out.println("DEBUG_12_1");
             try {
 
-                Reflections reflections= new Reflections("com.SMPCore.perks."+combatStatType.name());
+                System.out.println("DEBUG_12_2");
+                Reflections reflections= new Reflections("com.SMPCore.skills.perks."+combatStatType.name());
                 reflections.getSubTypesOf(SkillPerk.class).forEach(aClass -> {
 
                     try {
+
+                        System.out.println("DEBUG_12_3");
 
                         SkillPerk skillPerk = aClass
                                 .getDeclaredConstructor().newInstance();
                         combatStatType.allPerks.put(aClass.getSimpleName(),skillPerk);
 
-                        if (AbilityIntentionType.allPerks == null) AbilityIntentionType.allPerks = new HashMap<>();
+//                        if (AbilityIntentionType.allPerks == null) AbilityIntentionType.allPerks = new HashMap<>();
                         AbilityIntentionType.allPerks.put(aClass.getSimpleName(),skillPerk);
 
+                        System.out.println("DEBUG_12_4");
                     } catch (Exception exception) {
                         System.out.println("["+combatStatType.name()+"]StatType Skill Perk must have a no-args constructor!");
                         throw new RuntimeException(exception);
@@ -48,11 +53,14 @@ public enum CombatStatType implements PlayerDataHandler.ExpId,iPerkContainer {
                 });
 
             } catch (Exception exception) {
+                exception.printStackTrace();
                 System.out.println(combatStatType.name()+" Combat Stat Type did not have any perks to register!");
             }
 
         });
+        System.out.println("DEBUG_12_B");
     }
+
 
     final String key,displayKey;
     public final Map<String, SkillPerk> allPerks = new HashMap<>();

@@ -14,6 +14,8 @@ import com.SMPCore.skills.AbilityMessageConfig;
 import com.SMPCore.skills.PlayerDataHandler;
 import com.SMPCore.skills.SkillListener;
 import com.SMPCore.skills.impl.AbilityIntentionType;
+import com.SMPCore.skills.impl.CombatStatType;
+import com.SMPCore.skills.impl.NonCombatStatType;
 import com.earth2me.essentials.Essentials;
 import com.github.fierioziy.particlenativeapi.api.ParticleNativeAPI;
 import com.github.fierioziy.particlenativeapi.api.particle.type.ParticleType;
@@ -64,6 +66,10 @@ public class Main extends JavaPlugin {
 
     @Override
     public void onEnable() {
+
+
+        CombatStatType.init();
+        NonCombatStatType.init();
 
         Bukkit.getWorlds().forEach(world -> world.getLivingEntities().stream().filter(Entity::isCustomNameVisible)
                 .forEach(Entity::remove));
