@@ -3,6 +3,7 @@ package com.SMPCore.skills;
 import com.MenuAPI.Utils;
 import com.SMPCore.Events.ExpIdExpGainEvent;
 import com.SMPCore.Events.ExpIdLevelUpEvent;
+import com.SMPCore.Utilities.TempEntityDataHandler;
 import com.SMPCore.mining.CustomBlockBreakEvent;
 import com.SMPCore.skills.impl.NonCombatStatType;
 import net.md_5.bungee.api.ChatMessageType;
@@ -36,18 +37,23 @@ public class SkillListener implements Listener {
 //                .block.getDrops(itemStack,customBlockBreakEvent.player)).stream().filter(Objects::nonNull).forEach(itemStack1 ->
 //                world.dropItemNaturally(customBlockBreakEvent.block.getLocation(),itemStack1.clone()));
 
-        if (material.name().endsWith("_ORE"))
-            PlayerDataHandler.addExp(customBlockBreakEvent.player, NonCombatStatType.MINING,ExpReason.GRIND,switch (material) {
-                case COAL_ORE,DEEPSLATE_COAL_ORE -> 30;
-                case COPPER_ORE,DEEPSLATE_COPPER_ORE -> 18;
-                case GOLD_ORE,DEEPSLATE_GOLD_ORE,NETHER_GOLD_ORE -> 180;
-                case REDSTONE_ORE,DEEPSLATE_REDSTONE_ORE -> 48;
-                case LAPIS_ORE,DEEPSLATE_LAPIS_ORE -> 60;
-                case EMERALD_ORE,DEEPSLATE_EMERALD_ORE -> 90;
-                case DIAMOND_ORE,DEEPSLATE_DIAMOND_ORE -> 300;
-                case STONE,COBBLESTONE -> 1;
+        if (material.name().endsWith("_ORE") || material.name().contains("STONE")) {
+            double v = switch (material) {
+                case COAL_ORE, DEEPSLATE_COAL_ORE -> 30;
+                case COPPER_ORE, DEEPSLATE_COPPER_ORE -> 18;
+                case GOLD_ORE, DEEPSLATE_GOLD_ORE, NETHER_GOLD_ORE -> 180;
+                case REDSTONE_ORE, DEEPSLATE_REDSTONE_ORE -> 48;
+                case LAPIS_ORE, DEEPSLATE_LAPIS_ORE -> 60;
+                case EMERALD_ORE, DEEPSLATE_EMERALD_ORE -> 90;
+                case DIAMOND_ORE, DEEPSLATE_DIAMOND_ORE -> 300;
+                case STONE, COBBLESTONE -> 1;
                 default -> 0;
-            });
+            };
+            PlayerDataHandler.addExp(customBlockBreakEvent.player, NonCombatStatType.MINING, ExpReason.GRIND, v);
+
+            if (v > 0) TempEntityDataHandler.getorAdd(customBlockBreakEvent.player).updateData("rageCurrent",Double.class,initial ->
+                    initial+v/10,0D);
+        }
 
     }
 

@@ -3,6 +3,7 @@ package com.SMPCore.mining;
 import com.MenuAPI.BukkitEventCaller;
 import com.MenuAPI.Utils;
 import com.SMPCore.Utilities.SoundPlayerUtils;
+import com.SMPCore.Utilities.TempEntityDataHandler;
 import com.SMPCore.skills.PlayerDataHandler;
 import com.SMPCore.skills.impl.NonCombatStatType;
 import net.minecraft.core.BlockPosition;
@@ -117,6 +118,8 @@ public class BrokenBlockHandlerList {
 
         public void incrementDamage(Player from, double multiplier,BreakType breakType) {
             if (isBroken()) return;
+
+            TempEntityDataHandler.getorAdd(from).playerCooldownHandler.setOnCoolDown("rageTickDownDelay");
 
             if (System.currentTimeMillis()-lastDamage >= 1000) {
                 sendBreakPacket(0, block);

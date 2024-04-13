@@ -308,15 +308,16 @@ public class EventListener implements Listener {
     @EventHandler
     public void onTick(TickedSMPEvent tickedSMPEvent) {
 
-        if (++c >= 4) {
+        if (++c >= 7) {
             Bukkit.getOnlinePlayers().forEach(player -> {
 
                 TempEntityDataHandler.EntityData entityData = TempEntityDataHandler.getorAdd(player);
-                if (!entityData.playerCooldownHandler.isOnCoolDown("rageLastUse",
-                        TimeUnit.SECONDS,2)) {
+                if (!(entityData.playerCooldownHandler.isOnCoolDown("rageLastUse",
+                        TimeUnit.SECONDS,2)) && !(entityData.playerCooldownHandler
+                        .isOnCoolDown("rageTickDownDelay",TimeUnit.SECONDS,3))) {
                     entityData.updateData("rageCurrent",
                             Double.class, initial -> {
-                        double v = initial+1;
+                        double v = initial-1;
                         return Math.max(0, Math.min(100, v));
                             }, 0D);
                 }
@@ -335,9 +336,9 @@ public class EventListener implements Listener {
         bossBar.setColor( v >= 0.65 ? BarColor.RED : v >= 0.35 ? BarColor.YELLOW :
                 BarColor.GREEN);
         bossBar.setProgress(Math.max(0,Math.min(1,v)));
-        bossBar.setTitle("&e&lRage: "+(v >= 0.75 ? "&a" : v >= 0.55 ? "&e" :
+        bossBar.setTitle(Utils.color("&e&lRage: "+(v >= 0.75 ? "&a" : v >= 0.55 ? "&e" :
                 v >= 0.35 ? "&6" : v >= 0.15 ? "&c" : "&4")+FormattedNumber
-                .getInstance().getCommaFormattedNumber(progress,1)+"/100");
+                .getInstance().getCommaFormattedNumber(progress,1)+"/100"));
 
     }
 
@@ -351,9 +352,9 @@ public class EventListener implements Listener {
                     .get("rageCurrent",Double.class,0D);
             double v = progress/100.0;
             bossBar = Bukkit.createBossBar(namespacedKey,
-                    "&e&lRage: "+(v >= 0.75 ? "&a" : v >= 0.55 ? "&e" :
+                    Utils.color("&e&lRage: "+(v >= 0.75 ? "&a" : v >= 0.55 ? "&e" :
                             v >= 0.35 ? "&6" : v >= 0.15 ? "&c" : "&4")+ FormattedNumber
-                            .getInstance().getCommaFormattedNumber(progress,1)+"/100", v >= 0.65 ? BarColor.RED : v >= 0.35 ? BarColor.YELLOW :
+                            .getInstance().getCommaFormattedNumber(progress,1)+"/100"), v >= 0.65 ? BarColor.RED : v >= 0.35 ? BarColor.YELLOW :
                     BarColor.GREEN, BarStyle.SEGMENTED_6, BarFlag.CREATE_FOG);
             bossBar.setProgress(Math.max(0,Math.min(1,v)));
         }

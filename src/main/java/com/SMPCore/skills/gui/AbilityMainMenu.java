@@ -28,37 +28,37 @@ public class AbilityMainMenu extends AbstractClickableGUI {
 
         registerPriority(new ItemAssignedButton(new ItemBuilder(Material.DIAMOND_ORE)
                 .setGlowing(true).setDisplayName("&bMining Abilities").setLore(DescriptionBuilder.init()
-                        .addLore("&7&lClick to select a mining ability")
+                        .addLore("&7&m    &e Click to select a mining ability &7&m    ")
                         .build()).build(false), new Button(11,guiClickEvent ->
                 openPage(new AbilitySelectorMenu(getPlayer(), AbilityIntentionType.MINING,this)),false)),
                 new ItemAssignedButton(new ItemBuilder(Material.WHEAT)
                         .setGlowing(true).setDisplayName("&bFarming Abilities").setLore(DescriptionBuilder.init()
-                                .addLore("&7&lClick to select a farming ability")
+                                .addLore("&7&m    &e Click to select a farming ability &7&m    ")
                                 .build()).build(false), new Button(12,guiClickEvent ->
                         openPage(new AbilitySelectorMenu(getPlayer(), AbilityIntentionType.FARMING,this)),false)),
                         new ItemAssignedButton(new ItemBuilder(Material.IRON_SWORD)
                                 .setGlowing(true).setDisplayName("&bSword Abilities").setLore(DescriptionBuilder.init()
-                                        .addLore("&7&lClick to select a sword ability")
+                                        .addLore("&7&m    &e Click to select a sword ability &7&m    ")
                                         .build()).build(false), new Button(13,guiClickEvent ->
                                 openPage(new AbilitySelectorMenu(getPlayer(), AbilityIntentionType.SWORD,this)),false)),
                                 new ItemAssignedButton(new ItemBuilder(Material.BOW)
                                         .setGlowing(true).setDisplayName("&bRanged Combat Abilities").setLore(DescriptionBuilder.init()
-                                                .addLore("&7&lClick to select a ranged combat ability")
+                                                .addLore("&7&m    &e Click to select a ranged combat ability &7&m    ")
                                                 .build()).build(false), new Button(14,guiClickEvent ->
                                         openPage(new AbilitySelectorMenu(getPlayer(), AbilityIntentionType.RANGED_COMBAT,this)),false)),
                 new ItemAssignedButton(new ItemBuilder(Material.IRON_CHESTPLATE)
                         .setGlowing(true).setDisplayName("&bPassive Defense Abilities").setLore(DescriptionBuilder.init()
-                                .addLore("&7&lClick to select a passive defense ability")
+                                .addLore("&7&m    &e Click to select a passive defense ability &7&m    ")
                                 .build()).build(false), new Button(15,guiClickEvent ->
                         openPage(new AbilitySelectorMenu(getPlayer(), AbilityIntentionType.DEFENSE_PASSIVE,this)),false)),
                 new ItemAssignedButton(new ItemBuilder(Material.ENCHANTED_BOOK)
                         .setGlowing(true).setDisplayName("&bEnchanting Abilities").setLore(DescriptionBuilder.init()
-                                .addLore("&7&lClick to select a enchanting ability")
+                                .addLore("&7&m    &e Click to select a enchanting ability &7&m    ")
                                 .build()).build(false), new Button(10,guiClickEvent ->
                         openPage(new AbilitySelectorMenu(getPlayer(), AbilityIntentionType.ENCHANTING,this)),false)),
                 new ItemAssignedButton(new ItemBuilder(Material.IRON_AXE)
                         .setGlowing(true).setDisplayName("&bWoodcutting & Melee Axe Abilities").setLore(DescriptionBuilder.init()
-                                .addLore("&7&lClick to select a woodcutting or axe ability!")
+                                .addLore("&7&m    &e Click to select a woodcutting or axe ability &7&m    ")
                                 .build()).build(false), new Button(16,guiClickEvent ->
                         openPage(new AbilitySelectorMenu(getPlayer(), AbilityIntentionType.AXE,this)),false))
         );
@@ -85,7 +85,7 @@ public class AbilityMainMenu extends AbstractClickableGUI {
 
         registerPriority(new ItemAssignedButton(new ItemBuilder(HeadUtils
                 .getItemHead("http://textures.minecraft.net/texture/3ed1aba73f639f4bc42bd48196c715197be2712c3b962c97ebf9e9ed8efa025"))
-                .setDisplayName("&cBack").setGlowing(true).build(false),new Button(20, guiClickEvent -> openPage(backPage),
+                .setDisplayName("&cBack").setGlowing(true).build(false),new Button(22, guiClickEvent -> openPage(backPage),
                 false)));
 
     }

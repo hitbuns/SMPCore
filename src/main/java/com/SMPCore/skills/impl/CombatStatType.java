@@ -1,5 +1,6 @@
 package com.SMPCore.skills.impl;
 
+import com.SMPCore.skills.AbilitySkillPerk;
 import com.SMPCore.skills.PlayerDataHandler;
 import com.SMPCore.skills.SkillPerk;
 import org.reflections.Reflections;
@@ -34,14 +35,18 @@ public enum CombatStatType implements PlayerDataHandler.ExpId,iPerkContainer {
 
                     try {
 
-                        System.out.println("DEBUG_12_3");
+                        System.out.println("DEBUG_12_3_"+aClass.getSimpleName());
 
-                        SkillPerk skillPerk = aClass
-                                .getDeclaredConstructor().newInstance();
-                        combatStatType.allPerks.put(aClass.getSimpleName(),skillPerk);
+                        if (!aClass.equals(AbilitySkillPerk.class)) {
+
+                            SkillPerk skillPerk = aClass
+                                    .getConstructor().newInstance();
+                            combatStatType.allPerks.put(aClass.getSimpleName(), skillPerk);
 
 //                        if (AbilityIntentionType.allPerks == null) AbilityIntentionType.allPerks = new HashMap<>();
-                        AbilityIntentionType.allPerks.put(aClass.getSimpleName(),skillPerk);
+                            AbilityIntentionType.allPerks.put(aClass.getSimpleName(), skillPerk);
+
+                        }
 
                         System.out.println("DEBUG_12_4");
                     } catch (Exception exception) {

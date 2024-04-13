@@ -2,6 +2,7 @@ package com.SMPCore;
 
 import com.SMPCore.Utilities.*;
 import com.SMPCore.Waypoints.WaypointListener;
+import com.SMPCore.commands.CmdAbility;
 import com.SMPCore.commands.CmdClaim;
 import com.SMPCore.commands.CmdSkills;
 import com.SMPCore.commands.CmdWarps;
@@ -128,6 +129,7 @@ public class Main extends JavaPlugin {
         getCommand("protectarea").setExecutor(new CmdClaim());
         getCommand("skills").setExecutor(new CmdSkills());
         getCommand("warps").setExecutor(new CmdWarps());
+        getCommand("ability").setExecutor(new CmdAbility());
     }
 
     void registerListeners() {

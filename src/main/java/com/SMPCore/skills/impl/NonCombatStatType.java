@@ -1,5 +1,6 @@
 package com.SMPCore.skills.impl;
 
+import com.SMPCore.skills.AbilitySkillPerk;
 import com.SMPCore.skills.PlayerDataHandler;
 import com.SMPCore.skills.SkillPerk;
 import org.reflections.Reflections;
@@ -31,7 +32,7 @@ public enum NonCombatStatType implements PlayerDataHandler.ExpId,iPerkContainer 
         Arrays.stream(NonCombatStatType.values()).forEach(combatStatType -> {
 
             System.out.println("DEBUG_13_1");
-            try {
+//            try {
 
                 System.out.println("DEBUG_13_2");
                 Reflections reflections= new Reflections("com.SMPCore.skills.perks."+combatStatType.name());
@@ -39,25 +40,27 @@ public enum NonCombatStatType implements PlayerDataHandler.ExpId,iPerkContainer 
 
                     try {
 
-                        System.out.println("DEBUG_13_3");
-                        SkillPerk skillPerk = aClass
-                                .getDeclaredConstructor().newInstance();
-                        combatStatType.allPerks.put(aClass.getSimpleName(),skillPerk);
+                        System.out.println("DEBUG_13_3_"+aClass.getSimpleName());
+                        if (!aClass.equals(AbilitySkillPerk.class)) {
+                            SkillPerk skillPerk = aClass
+                                    .getDeclaredConstructor().newInstance();
+                            combatStatType.allPerks.put(aClass.getSimpleName(), skillPerk);
 //                        if (AbilityIntentionType.allPerks == null) AbilityIntentionType.allPerks = new HashMap<>();
-                        AbilityIntentionType.allPerks.put(aClass.getSimpleName(),skillPerk);
+                            AbilityIntentionType.allPerks.put(aClass.getSimpleName(), skillPerk);
 
+                        }
                         System.out.println("DEBUG_13_4");
                     } catch (Exception exception) {
                         System.out.println("["+combatStatType.name()+"]StatType Skill Perk must have a no-args constructor!");
-                        throw new RuntimeException(exception);
+                        exception.printStackTrace();
                     }
 
 
                 });
-
-            } catch (Exception exception) {
-                System.out.println(combatStatType.name()+" Combat Stat Type did not have any perks to register!");
-            }
+//
+//            } catch (Exception exception) {
+//                System.out.println(combatStatType.name()+" Combat Stat Type did not have any perks to register!");
+//            }
 
         });
         System.out.println("DEBUG_13_B");

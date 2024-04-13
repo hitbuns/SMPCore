@@ -28,3 +28,7 @@ commands:
     usage: /skills
   warps:
     usage: /warps
+  ability:
+    usage: /ability
+    aliases:
+      - abilities
