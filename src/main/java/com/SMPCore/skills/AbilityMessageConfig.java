@@ -20,15 +20,15 @@ public class AbilityMessageConfig extends Config {
         super(javaPlugin, javaPlugin.getDataFolder(), "ability-message.yml");
 
         ConfigurationSection configurationSection = getorAddConfigurationSection("descriptions");
-        System.out.println("FULL_DEBUG_1");
+        //System.out.println("FULL_DEBUG_1");
         for (CombatStatType value : CombatStatType.values()) {
-            System.out.println("FULL_DEBUG_2_"+value.name());
+            //System.out.println("FULL_DEBUG_2_"+value.name());
             try {
-                System.out.println("LIST_SIZE>>"+value.allPerks.size());
+                //System.out.println("LIST_SIZE>>"+value.allPerks.size());
                 value.allPerks.forEach((s, skillPerk) -> {
-                    System.out.println("CHECK SKILL DESCRIPTION>> " + s);
+                    //System.out.println("CHECK SKILL DESCRIPTION>> " + s);
                     if (!configurationSection.contains(s)) {
-                        System.out.println("GENERATE SKILL DESCRIPTION>> " + s);
+                        //System.out.println("GENERATE SKILL DESCRIPTION>> " + s);
                         configurationSection.set(s, Arrays.asList("&eThis is an ability!"));
                     }
                 });
@@ -37,15 +37,15 @@ public class AbilityMessageConfig extends Config {
             }
         }
 
-        System.out.println("FULL_DEBUG_3");
+        //System.out.println("FULL_DEBUG_3");
         for (NonCombatStatType value : NonCombatStatType.values()) {
-            System.out.println("FULL_DEBUG_4_"+value.name());
+            //System.out.println("FULL_DEBUG_4_"+value.name());
             try {
-                System.out.println("LIST_SIZE>>"+value.allPerks.size());
+                //System.out.println("LIST_SIZE>>"+value.allPerks.size());
                 value.allPerks.forEach((s, skillPerk) -> {
-                    System.out.println("CHECK SKILL DESCRIPTION>> "+s);
+                    //System.out.println("CHECK SKILL DESCRIPTION>> "+s);
                     if (!configurationSection.contains(s)) {
-                        System.out.println("GENERATE SKILL DESCRIPTION>> "+s);
+                        //System.out.println("GENERATE SKILL DESCRIPTION>> "+s);
                         configurationSection.set(s, Arrays.asList("&eThis is an ability!"));
                     }
                 });
@@ -54,11 +54,11 @@ public class AbilityMessageConfig extends Config {
             }
         }
 
-        System.out.println("FULL_DEBUG_5");
+        //System.out.println("FULL_DEBUG_5");
 
         save();
 
-        System.out.println("FULL_DEBUG_6");
+        //System.out.println("FULL_DEBUG_6");
 
 
     }

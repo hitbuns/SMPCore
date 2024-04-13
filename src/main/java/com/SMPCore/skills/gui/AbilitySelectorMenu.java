@@ -54,7 +54,7 @@ public class AbilitySelectorMenu extends AbstractModifiableListMenu<AbilitySkill
                            }
 
 
-                       }).toList());
+                       }).filter(Objects::nonNull).toList());
            }
 
            abilities.put(abilityIntentionType, abilitySkillPerks = abilitySkillPerkList.toArray(AbilitySkillPerk[]::new));
@@ -125,17 +125,17 @@ public class AbilitySelectorMenu extends AbstractModifiableListMenu<AbilitySkill
     public GUIClickRunnable onGUIClick() {
         return guiClickEvent -> {
 
-            System.out.println("ABILITY_TEST_1");
+            //System.out.println("ABILITY_TEST_1");
 
             ItemStack itemStack1 = guiClickEvent.getCurrentItem();
             ClickType clickType = guiClickEvent.getClickType();
             if (Utils.isNullorAir(itemStack1)) return;
 
-            System.out.println("ABILITY_TEST_2");
+            //System.out.println("ABILITY_TEST_2");
             NBTItem nbtItem = new NBTItem(itemStack1);
             if (nbtItem.hasKey("clickValue")) {
 
-                System.out.println("ABILITY_TEST_3");
+                //System.out.println("ABILITY_TEST_3");
                 AbilitySkillPerk abilitySkillPerk = abilitySkillPerks[nbtItem.getInteger("clickValue")];
                 switch (clickType) {
                     case LEFT -> PlayerDataHandler.update(getPlayer(), Updates.set("ability_"+abilityIntentionType
@@ -144,9 +144,9 @@ public class AbilitySelectorMenu extends AbstractModifiableListMenu<AbilitySkill
                             .name()+"_SECONDARY",abilitySkillPerk.getClass().getSimpleName()));
                 }
 
-                System.out.println("ABILITY_TEST_4");
+                //System.out.println("ABILITY_TEST_4");
                 update();
-                System.out.println("ABILITY_TEST_5");
+                //System.out.println("ABILITY_TEST_5");
 
             }
 
@@ -172,11 +172,11 @@ public class AbilitySelectorMenu extends AbstractModifiableListMenu<AbilitySkill
     public void update() {
         super.update();
 
-        System.out.println("ABILITY_TEST_UPDATE_1");
+        //System.out.println("ABILITY_TEST_UPDATE_1");
 
         updateInfoButton();
 
-        System.out.println("ABILITY_TEST_UPDATE_2");
+        //System.out.println("ABILITY_TEST_UPDATE_2");
     }
 
 

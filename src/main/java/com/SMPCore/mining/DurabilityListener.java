@@ -129,7 +129,9 @@ public class DurabilityListener implements Listener {
             default -> 0;
         } : 0) )*(1+0.25*(Utils.isNullorAir(itemStack) ? 0 : itemStack.getEnchantmentLevel(Enchantment.DIG_SPEED)));
 
-        brokenBlockHandlerList.getBrokenBlock(blockPosition).incrementDamage(player, multiplier,breakType);
+        brokenBlockHandlerList.getBrokenBlock(blockPosition).incrementDamage(player, multiplier*(1+0.2*(player.hasPotionEffect(
+                PotionEffectType.FAST_DIGGING
+        ) ? player.getPotionEffect(PotionEffectType.FAST_DIGGING).getAmplifier()+1 : 0)),breakType);
     }
 
 

@@ -34,11 +34,13 @@ import org.bukkit.boss.BossBar;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.CraftingRecipe;
@@ -54,6 +56,23 @@ public class EventListener implements Listener {
 //        playerJoinEvent.getPlayer().setResourcePack("https://www.dropbox.com/scl/fi/jhos5u893isxuair15gaa/quartzpack.zip?rlkey=if30890t05j20yv4yraxobnz6&dl=0");
 //
 //    }
+
+    @EventHandler(priority = EventPriority.MONITOR,ignoreCancelled = true)
+    public void onDamageTaken(EntityDamageByEntityEvent entityDamageByEntityEvent) {
+
+        if (entityDamageByEntityEvent.getEntity() instanceof Player player) {
+            TempEntityDataHandler.EntityData entityData = TempEntityDataHandler.getorAdd(player);
+            entityData.playerCooldownHandler.setOnCoolDown("rageTickDownDelay");
+            entityData.updateData("rageCurrent",Double.class,initial -> Math.max(Math.min(100,initial+0.03*entityDamageByEntityEvent.getDamage()),0),0D);
+        }
+
+        if (Utils.getAttacker(entityDamageByEntityEvent.getDamager()) instanceof Player player) {
+            TempEntityDataHandler.EntityData entityData = TempEntityDataHandler.getorAdd(player);
+            entityData.playerCooldownHandler.setOnCoolDown("rageTickDownDelay");
+            entityData.updateData("rageCurrent",Double.class,initial -> Math.max(Math.min(100,initial+0.2*entityDamageByEntityEvent.getDamage()),0),0D);
+        }
+
+    }
 
 
     @EventHandler
@@ -317,7 +336,7 @@ public class EventListener implements Listener {
                         .isOnCoolDown("rageTickDownDelay",TimeUnit.SECONDS,3))) {
                     entityData.updateData("rageCurrent",
                             Double.class, initial -> {
-                        double v = initial-1;
+                        double v = initial-0.4;
                         return Math.max(0, Math.min(100, v));
                             }, 0D);
                 }

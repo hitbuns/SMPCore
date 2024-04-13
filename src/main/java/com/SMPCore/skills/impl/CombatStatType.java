@@ -24,18 +24,18 @@ public enum CombatStatType implements PlayerDataHandler.ExpId,iPerkContainer {
     }
 
     public static void init() {
-        System.out.println("DEBUG_12_A");
+        //System.out.println("DEBUG_12_A");
         Arrays.stream(CombatStatType.values()).forEach(combatStatType -> {
-            System.out.println("DEBUG_12_1");
+            //System.out.println("DEBUG_12_1");
             try {
 
-                System.out.println("DEBUG_12_2");
+                //System.out.println("DEBUG_12_2");
                 Reflections reflections= new Reflections("com.SMPCore.skills.perks."+combatStatType.name());
                 reflections.getSubTypesOf(SkillPerk.class).forEach(aClass -> {
 
                     try {
 
-                        System.out.println("DEBUG_12_3_"+aClass.getSimpleName());
+                        //System.out.println("DEBUG_12_3_"+aClass.getSimpleName());
 
                         if (!aClass.equals(AbilitySkillPerk.class)) {
 
@@ -48,7 +48,7 @@ public enum CombatStatType implements PlayerDataHandler.ExpId,iPerkContainer {
 
                         }
 
-                        System.out.println("DEBUG_12_4");
+                        //System.out.println("DEBUG_12_4");
                     } catch (Exception exception) {
                         System.out.println("["+combatStatType.name()+"]StatType Skill Perk must have a no-args constructor!");
                         throw new RuntimeException(exception);
@@ -63,7 +63,7 @@ public enum CombatStatType implements PlayerDataHandler.ExpId,iPerkContainer {
             }
 
         });
-        System.out.println("DEBUG_12_B");
+        //System.out.println("DEBUG_12_B");
     }
 
 

@@ -98,7 +98,7 @@ public class CmdClaim implements CommandExecutor, TabCompleter {
                 long volume = cuboidRegion.getVolume(),total = regionManager.getRegions().values().stream().filter(protectedRegion -> protectedRegion.getOwners()
                         .contains(player.getUniqueId())).mapToLong(ProtectedRegion::volume).sum() + volume;
 
-                System.out.println("VOLUME>> "+volume+":: TOTAL>> "+total);
+                //System.out.println("VOLUME>> "+volume+":: TOTAL>> "+total);
 
                 if (total >= 500000) {
                     player.sendMessage(Utils.color("&4[!] &eYou cannot claim this region as it would exceed 500000 block volume"));

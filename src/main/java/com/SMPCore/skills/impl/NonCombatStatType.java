@@ -28,19 +28,19 @@ public enum NonCombatStatType implements PlayerDataHandler.ExpId,iPerkContainer 
     }
 
     public static void init() {
-        System.out.println("DEBUG_13_A");
+        //System.out.println("DEBUG_13_A");
         Arrays.stream(NonCombatStatType.values()).forEach(combatStatType -> {
 
-            System.out.println("DEBUG_13_1");
+            //System.out.println("DEBUG_13_1");
 //            try {
 
-                System.out.println("DEBUG_13_2");
+                //System.out.println("DEBUG_13_2");
                 Reflections reflections= new Reflections("com.SMPCore.skills.perks."+combatStatType.name());
                 reflections.getSubTypesOf(SkillPerk.class).forEach(aClass -> {
 
                     try {
 
-                        System.out.println("DEBUG_13_3_"+aClass.getSimpleName());
+                        //System.out.println("DEBUG_13_3_"+aClass.getSimpleName());
                         if (!aClass.equals(AbilitySkillPerk.class)) {
                             SkillPerk skillPerk = aClass
                                     .getDeclaredConstructor().newInstance();
@@ -49,7 +49,7 @@ public enum NonCombatStatType implements PlayerDataHandler.ExpId,iPerkContainer 
                             AbilityIntentionType.allPerks.put(aClass.getSimpleName(), skillPerk);
 
                         }
-                        System.out.println("DEBUG_13_4");
+                        //System.out.println("DEBUG_13_4");
                     } catch (Exception exception) {
                         System.out.println("["+combatStatType.name()+"]StatType Skill Perk must have a no-args constructor!");
                         exception.printStackTrace();
@@ -59,11 +59,11 @@ public enum NonCombatStatType implements PlayerDataHandler.ExpId,iPerkContainer 
                 });
 //
 //            } catch (Exception exception) {
-//                System.out.println(combatStatType.name()+" Combat Stat Type did not have any perks to register!");
+//                //System.out.println(combatStatType.name()+" Combat Stat Type did not have any perks to register!");
 //            }
 
         });
-        System.out.println("DEBUG_13_B");
+        //System.out.println("DEBUG_13_B");
     }
 
 

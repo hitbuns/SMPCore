@@ -169,7 +169,7 @@ public class ParticleUtils {
 
                         angle += angleBetweenPoints;
 
-                        //System.out.println("ANGLE>> "+Math.toDegrees(vector.clone().setY(0).angle(original.toVector().subtract(location1.toVector()).setY(0))));
+                        ////System.out.println("ANGLE>> "+Math.toDegrees(vector.clone().setY(0).angle(original.toVector().subtract(location1.toVector()).setY(0))));
                         if (Math.toDegrees(vector.clone().multiply(-1).setY(0).angle(original.toVector().subtract(location1.toVector()).setY(0))) > angleArc/2) continue;
 
                         if (seeRadius > 0)
@@ -202,7 +202,7 @@ public class ParticleUtils {
                         location1.add(Math.sin(b)*radius,0,Math.cos(b)*radius);
                         angle += angleBetweenPoints;
 
-                        //System.out.println("ANGLE>> "+Math.toDegrees(vector.clone().setY(0).angle(original.toVector().subtract(location1.toVector()).setY(0))));
+                        ////System.out.println("ANGLE>> "+Math.toDegrees(vector.clone().setY(0).angle(original.toVector().subtract(location1.toVector()).setY(0))));
                         if (Math.toDegrees(vector.clone().setY(0).multiply(-1).angle(original.toVector().subtract(location1.toVector()).setY(0))) > angleArc/2) continue;
 
                         if (seeRadius > 0)
