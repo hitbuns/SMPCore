@@ -52,7 +52,7 @@ public class SkillListener implements Listener {
             PlayerDataHandler.addExp(customBlockBreakEvent.player, NonCombatStatType.MINING, ExpReason.GRIND, v);
 
             if (v > 0) TempEntityDataHandler.getorAdd(customBlockBreakEvent.player).updateData("rageCurrent",Double.class,initial ->
-                    initial+v/10,0D);
+                    Math.max(0,Math.min(initial+v/10,100)),0D);
         }
 
     }
