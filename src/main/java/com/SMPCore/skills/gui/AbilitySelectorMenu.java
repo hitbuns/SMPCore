@@ -1,6 +1,7 @@
 package com.SMPCore.skills.gui;
 
 import com.MenuAPI.GUISystem.AbstractModifiableListMenu;
+import com.MenuAPI.GUISystem.Button;
 import com.MenuAPI.GUISystem.GUIClickRunnable;
 import com.MenuAPI.GUISystem.iPage;
 import com.MenuAPI.Utilities.DecorationUtils;
@@ -61,6 +62,9 @@ public class AbilitySelectorMenu extends AbstractModifiableListMenu<AbilitySkill
        }
 
        init(30,32,31,10,11,12,13,14,15,16,19,20,21,22,23,24,25);
+
+       registerPriority(new Button(31,guiClickEvent -> closePage(backPage),
+               false));
 
     }
 

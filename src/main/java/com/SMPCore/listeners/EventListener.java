@@ -2,9 +2,8 @@ package com.SMPCore.listeners;
 
 import be.razerstorm.customcrafting.events.PushRecipeToServerEvent;
 import be.razerstorm.customcrafting.events.RecipeRemoveEvent;
-import com.MenuAPI.ItemAdder;
 import com.MenuAPI.Utilities.BukkitEventCaller;
-import com.MenuAPI.Utilities.impl.HeadUtils;
+import com.MenuAPI.Utilities.FormattedNumber;
 import com.MenuAPI.Utils;
 import com.SMPCore.Events.DropTriggerEvent;
 import com.SMPCore.Events.TickedSMPEvent;
@@ -14,7 +13,6 @@ import com.SMPCore.configs.CraftExpConfig;
 import com.SMPCore.gui.WarpGUI;
 import com.SMPCore.skills.AbilitySkillPerk;
 import com.SMPCore.skills.PlayerDataHandler;
-import com.SMPCore.skills.SkillPerk;
 import com.SMPCore.skills.impl.AbilityIntentionType;
 import com.SoundAnimation.SoundAPI;
 import com.sk89q.worldedit.LocalSession;
@@ -41,7 +39,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.CraftingRecipe;
@@ -299,20 +296,48 @@ public class EventListener implements Listener {
     private static AbilityIntentionType getAbilityIntentionType(ItemStack itemStack) {
         String material = itemStack.getType().name();
 
-        AbilityIntentionType abilityIntentionType = material.contains("_PICKAXE") ? AbilityIntentionType.MINING : material.contains("_AXE") ?
+        return material.contains("_PICKAXE") ? AbilityIntentionType.MINING : material.contains("_AXE") ?
                 AbilityIntentionType.AXE : material.contains("_SWORD") ? AbilityIntentionType.SWORD : material.contains("_HOE") ? AbilityIntentionType.FARMING :
                 itemStack.getType() == Material.BOW || itemStack.getType() == Material.CROSSBOW ? AbilityIntentionType.RANGED_COMBAT : itemStack.getType() == Material.ENCHANTED_BOOK ?
                         AbilityIntentionType.ENCHANTING : null;
-        return abilityIntentionType;
     }
+
+
+    int c = 0;
 
     @EventHandler
     public void onTick(TickedSMPEvent tickedSMPEvent) {
 
-        Bukkit.getOnlinePlayers().forEach(player -> {
+        if (++c >= 4) {
+            Bukkit.getOnlinePlayers().forEach(player -> {
 
+                TempEntityDataHandler.EntityData entityData = TempEntityDataHandler.getorAdd(player);
+                if (!entityData.playerCooldownHandler.isOnCoolDown("rageLastUse",
+                        TimeUnit.SECONDS,2)) {
+                    entityData.updateData("rageCurrent",
+                            Double.class, initial -> {
+                        double v = initial+1;
+                        return Math.max(0, Math.min(100, v));
+                            }, 0D);
+                }
+                updateRage(player);
+            });
+            c = 0;
+        }
 
-        });
+    }
+
+    static void updateRage(Player player) {
+        double progress= TempEntityDataHandler.getorAdd(player)
+                .get("rageCurrent",Double.class,0D);
+        double v = progress/100.0;
+        BossBar bossBar = getorAddBossBar(player);
+        bossBar.setColor( v >= 0.65 ? BarColor.RED : v >= 0.35 ? BarColor.YELLOW :
+                BarColor.GREEN);
+        bossBar.setProgress(Math.max(0,Math.min(1,v)));
+        bossBar.setTitle("&e&lRage: "+(v >= 0.75 ? "&a" : v >= 0.55 ? "&e" :
+                v >= 0.35 ? "&6" : v >= 0.15 ? "&c" : "&4")+FormattedNumber
+                .getInstance().getCommaFormattedNumber(progress,1)+"/100");
 
     }
 
@@ -322,8 +347,15 @@ public class EventListener implements Listener {
         BossBar bossBar = Bukkit.getBossBar(namespacedKey);
 
         if (bossBar == null) {
+            double progress= TempEntityDataHandler.getorAdd(player)
+                    .get("rageCurrent",Double.class,0D);
+            double v = progress/100.0;
             bossBar = Bukkit.createBossBar(namespacedKey,
-                    "&eRage: ", BarColor.GREEN, BarStyle.SEGMENTED_6, BarFlag.CREATE_FOG);
+                    "&e&lRage: "+(v >= 0.75 ? "&a" : v >= 0.55 ? "&e" :
+                            v >= 0.35 ? "&6" : v >= 0.15 ? "&c" : "&4")+ FormattedNumber
+                            .getInstance().getCommaFormattedNumber(progress,1)+"/100", v >= 0.65 ? BarColor.RED : v >= 0.35 ? BarColor.YELLOW :
+                    BarColor.GREEN, BarStyle.SEGMENTED_6, BarFlag.CREATE_FOG);
+            bossBar.setProgress(Math.max(0,Math.min(1,v)));
         }
 
         if (!bossBar.getPlayers().contains(player)) bossBar.addPlayer(player);
