@@ -17,7 +17,7 @@ public class AbilityMainMenu extends AbstractClickableGUI {
     final iPage backPage;
 
     public AbilityMainMenu(Player player, iPage backPage) {
-        super(player, "Ability Selector", 3, false);
+        super(player, "Ability Selector", 4, false);
         this.backPage = backPage;
 
         init();
@@ -54,12 +54,17 @@ public class AbilityMainMenu extends AbstractClickableGUI {
                 new ItemAssignedButton(new ItemBuilder(Material.ENCHANTED_BOOK)
                         .setGlowing(true).setDisplayName("&bEnchanting Abilities").setLore(DescriptionBuilder.init()
                                 .addLore("&7&m    &e Click to select a enchanting ability &7&m    ")
-                                .build()).build(false), new Button(10,guiClickEvent ->
+                                .build()).build(false), new Button(21,guiClickEvent ->
                         openPage(new AbilitySelectorMenu(getPlayer(), AbilityIntentionType.ENCHANTING,this)),false)),
                 new ItemAssignedButton(new ItemBuilder(Material.IRON_AXE)
                         .setGlowing(true).setDisplayName("&bWoodcutting & Melee Axe Abilities").setLore(DescriptionBuilder.init()
                                 .addLore("&7&m    &e Click to select a woodcutting or axe ability &7&m    ")
-                                .build()).build(false), new Button(16,guiClickEvent ->
+                                .build()).build(false), new Button(22,guiClickEvent ->
+                        openPage(new AbilitySelectorMenu(getPlayer(), AbilityIntentionType.AXE,this)),false)),
+                new ItemAssignedButton(new ItemBuilder(Material.IRON_AXE)
+                        .setGlowing(true).setDisplayName("&bWoodcutting & Melee Axe Abilities").setLore(DescriptionBuilder.init()
+                                .addLore("&7&m    &e Click to select a woodcutting or axe ability &7&m    ")
+                                .build()).build(false), new Button(23,guiClickEvent ->
                         openPage(new AbilitySelectorMenu(getPlayer(), AbilityIntentionType.AXE,this)),false))
         );
 
@@ -85,7 +90,7 @@ public class AbilityMainMenu extends AbstractClickableGUI {
 
         registerPriority(new ItemAssignedButton(new ItemBuilder(HeadUtils
                 .getItemHead("http://textures.minecraft.net/texture/3ed1aba73f639f4bc42bd48196c715197be2712c3b962c97ebf9e9ed8efa025"))
-                .setDisplayName("&cBack").setGlowing(true).build(false),new Button(22, guiClickEvent -> openPage(backPage),
+                .setDisplayName("&cBack").setGlowing(true).build(false),new Button(31, guiClickEvent -> openPage(backPage),
                 false)));
 
     }

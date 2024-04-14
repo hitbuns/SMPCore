@@ -46,6 +46,7 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.CraftingRecipe;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 public class EventListener implements Listener {
@@ -189,6 +190,8 @@ public class EventListener implements Listener {
 
         Player player = playerInteractEvent.getPlayer();
 
+        AbilityIntentionType.allPerks.forEach((s, skillPerk) -> skillPerk.onEvent(playerInteractEvent, player));
+
         ItemStack itemStack = player.getInventory().getItemInMainHand();
         Action action = playerInteractEvent.getAction();
         if (Utils.isNullorAir(itemStack) || action == Action.PHYSICAL || action.name().contains("AIR")) return;
@@ -312,7 +315,7 @@ public class EventListener implements Listener {
 
     }
 
-    private static AbilityIntentionType getAbilityIntentionType(ItemStack itemStack) {
+    public static AbilityIntentionType getAbilityIntentionType(ItemStack itemStack) {
         String material = itemStack.getType().name();
 
         return material.contains("_PICKAXE") ? AbilityIntentionType.MINING : material.contains("_AXE") ?
@@ -327,8 +330,12 @@ public class EventListener implements Listener {
     @EventHandler
     public void onTick(TickedSMPEvent tickedSMPEvent) {
 
+        Collection<? extends Player> players = Bukkit.getOnlinePlayers();
+
+        players.forEach(player -> AbilityIntentionType.allPerks.forEach((s, skillPerk) -> skillPerk.onEvent(tickedSMPEvent, player)));
+
         if (++c >= 7) {
-            Bukkit.getOnlinePlayers().forEach(player -> {
+            players.forEach(player -> {
 
                 TempEntityDataHandler.EntityData entityData = TempEntityDataHandler.getorAdd(player);
                 if (!(entityData.playerCooldownHandler.isOnCoolDown("rageLastUse",
@@ -355,6 +362,7 @@ public class EventListener implements Listener {
         bossBar.setColor( v >= 0.65 ? BarColor.RED : v >= 0.35 ? BarColor.YELLOW :
                 BarColor.GREEN);
         bossBar.setProgress(Math.max(0,Math.min(1,v)));
+        bossBar.removeFlag(BarFlag.CREATE_FOG);
         bossBar.setTitle(Utils.color("&e&lRage: "+(v >= 0.75 ? "&a" : v >= 0.55 ? "&e" :
                 v >= 0.35 ? "&6" : v >= 0.15 ? "&c" : "&4")+FormattedNumber
                 .getInstance().getCommaFormattedNumber(progress,1)+"/100"));

@@ -1,22 +1,35 @@
 package com.SMPCore.skills;
 
+import com.MenuAPI.BukkitEventCaller;
 import com.MenuAPI.Utils;
 import com.SMPCore.Events.ExpIdExpGainEvent;
 import com.SMPCore.Events.ExpIdLevelUpEvent;
+import com.SMPCore.Events.FarmHarvestEvent;
 import com.SMPCore.Utilities.TempEntityDataHandler;
+import com.SMPCore.listeners.EventListener;
 import com.SMPCore.mining.CustomBlockBreakEvent;
+import com.SMPCore.skills.impl.AbilityIntentionType;
 import com.SMPCore.skills.impl.NonCombatStatType;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.data.Ageable;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.type.Bamboo;
+import org.bukkit.block.data.type.Cocoa;
+import org.bukkit.block.data.type.PitcherCrop;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 public class SkillListener implements Listener {
@@ -49,6 +62,9 @@ public class SkillListener implements Listener {
                 case STONE, COBBLESTONE -> 1;
                 default -> 0;
             };
+
+            AbilityIntentionType.allPerks.forEach((s, skillPerk) -> skillPerk.onEvent(customBlockBreakEvent, customBlockBreakEvent.player));
+
             PlayerDataHandler.addExp(customBlockBreakEvent.player, NonCombatStatType.MINING, ExpReason.GRIND, v);
 
             if (v > 0) TempEntityDataHandler.getorAdd(customBlockBreakEvent.player).updateData("rageCurrent",Double.class,initial ->
@@ -78,6 +94,52 @@ public class SkillListener implements Listener {
                             .getPreviousLevel()+"&b ➪ &a"+expIdLevelUpEvent.getNewLevel()),5,45,15);
 
         }
+
+    }
+
+    @EventHandler (ignoreCancelled = true,priority = EventPriority.MONITOR)
+    public void onFarmHarvest(FarmHarvestEvent farmHarvestEvent) {
+        if (farmHarvestEvent.isCancelled()) return;
+
+        AbilityIntentionType.allPerks.forEach((s, skillPerk) -> skillPerk.onEvent(farmHarvestEvent, farmHarvestEvent.getPlayer()));
+
+    }
+
+
+    //FARMING
+    @EventHandler (priority = EventPriority.MONITOR,ignoreCancelled = true)
+    public void onBlockBreakEvent(BlockBreakEvent blockBreakEvent) {
+        if (blockBreakEvent.isCancelled()) return;
+
+        Player player = blockBreakEvent.getPlayer();
+        Block block = blockBreakEvent.getBlock();
+
+        BlockData blockData = block.getBlockData();
+
+        if (!(blockData instanceof Ageable ageable)) return;
+
+        if (ageable.getAge() != ageable.getMaximumAge()) return;
+
+        Material material = block.getType();
+
+        if (material == Material.FIRE || material == Material.CAVE_VINES || material == Material.BAMBOO || material.name().contains("SAPLING")) return;
+
+        FarmHarvestEvent farmHarvestEvent = new FarmHarvestEvent(blockBreakEvent,player,3,1);
+        if (BukkitEventCaller.callEvent(farmHarvestEvent)) {
+            blockBreakEvent.setCancelled(true);
+            return;
+        }
+
+
+        PlayerDataHandler.addExp(player,NonCombatStatType.FARMING,ExpReason.GRIND,Math.max(0,farmHarvestEvent.exp));
+
+        block.getDrops(player.getInventory().getItemInMainHand()).stream().filter(itemStack -> !Utils.isNullorAir(itemStack)).peek(itemStack -> itemStack.setAmount((int) Math.round(Math.max(0,itemStack
+                .getAmount()*0.05*farmHarvestEvent.amountMultiplier*PlayerDataHandler.getLevel(player,NonCombatStatType.FARMING))))).filter(itemStack -> itemStack.getAmount() >= 1).forEach(
+                        itemStack -> block.getWorld().dropItemNaturally(block.getLocation(),itemStack)
+        );
+
+
+
 
     }
 

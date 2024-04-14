@@ -11,10 +11,12 @@ import java.util.Map;
 
 public enum NonCombatStatType implements PlayerDataHandler.ExpId,iPerkContainer {
 
+    //DONE
     FARMING("&bFarming"),
     COOKING("&aCooking"),
     FISHING("&2Fishing"),
     WOODCUTTING("&bWoodcutting"),
+    //DONE
     MINING("&cMining"),
     CRAFTING("&3Crafting"),
     ENCHANTING("&4Enchanting"),

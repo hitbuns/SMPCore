@@ -8,9 +8,11 @@ import com.SMPCore.Utilities.TempEntityDataHandler;
 import com.SMPCore.mobs.MobModifierType;
 import com.SMPCore.mobs.MobType;
 import com.SMPCore.mobs.MobTypeContainer;
+import com.SMPCore.skills.impl.AbilityIntentionType;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -121,6 +123,9 @@ public class MobListener implements Listener {
 
         if (entityDamageEvent.getEntity() instanceof LivingEntity livingEntity) {
 
+            if (livingEntity instanceof Player player) AbilityIntentionType.allPerks.forEach((s, skillPerk) -> skillPerk.onEvent(entityDamageEvent, player));
+
+
             if (TempEntityDataHandler.getorAdd(livingEntity).playerCooldownHandler.isOnCoolDown("vanilla_spawn",
                     TimeUnit.MILLISECONDS,5*50L)) {
                 entityDamageEvent.setCancelled(true);
@@ -149,6 +154,8 @@ public class MobListener implements Listener {
                     .getDamager());
 
             if (livingEntity == null) return;
+
+            if (livingEntity instanceof Player player) AbilityIntentionType.allPerks.forEach((s, skillPerk) -> skillPerk.onEvent(entityDamageEvent, player));
 
             MobType mobType = MobType.getMobType(livingEntity);
             MobModifierType mobModifierType = MobType.getMobTypeModifier(livingEntity);

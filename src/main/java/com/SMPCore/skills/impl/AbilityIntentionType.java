@@ -8,13 +8,17 @@ import java.util.Map;
 
 public enum AbilityIntentionType {
 
+
+    //DONE
     MINING(NonCombatStatType.MINING),
+
     FARMING(NonCombatStatType.FARMING),
     SWORD(CombatStatType.STRENGTH),
     RANGED_COMBAT(CombatStatType.DEXTERITY),
     DEFENSE_PASSIVE(CombatStatType.DEFENSE),
     ENCHANTING(NonCombatStatType.ENCHANTING),
-    AXE(CombatStatType.STRENGTH,NonCombatStatType.WOODCUTTING)
+    AXE(CombatStatType.STRENGTH,NonCombatStatType.WOODCUTTING),
+    FISHING(NonCombatStatType.FISHING)
 
 
     ;
