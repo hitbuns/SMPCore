@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -40,18 +41,26 @@ public class CombineItemListener implements Listener {
         int v = (nbtItem1.hasKey("combinePower") ? nbtItem1
                 .getInteger("combinePower") : 1)+(nbtItem2.hasKey("combinePower") ? nbtItem2
                 .getInteger("combinePower") : 1);
+        Rarity rarity = Rarity.getRarity(v);
+        double a = 100+rarity.priority*10D;
         nbtItem1.setInteger("combinePower",v);
+        nbtItem1.setDouble("power",a);
+
 
         ItemStack itemStack = nbtItem1.getItem();
 
         ItemMeta meta = itemStack.getItemMeta();
-        Rarity rarity = Rarity.getRarity(v);
 
         AbilityIntentionType abilityIntentionType = EventListener.getAbilityIntentionType(itemStack);
 
         meta.setLore(Utils.color(Arrays.asList("&8&m============================",
                 "&7  "+switch (abilityIntentionType) {
-                    case MINING -> "Mining Power %: &a";
+                    case MINING -> "Mining Speed: "+a+"%";
+                    case AXE -> "Axe Power: &a"+a+"%";
+                    case SWORD -> "Sweep Radius: &a"+a+"%";
+                    case FARMING -> "Double Crop Chance: &a"+(a-100)+"%";
+                    case FISHING -> "Loot Bonus: &a"+a+"%";
+                    case RANGED_COMBAT -> "Pierce Chance: &a"+((a-100)*0.5)+"%";
                     default -> "";
                 },
                 "",
@@ -65,7 +74,8 @@ public class CombineItemListener implements Listener {
                     case GODLY -> "&bGodly";
                     case UNHOLY -> "&4Unholy";
                 },
-                "  &7Progress: &8["+Utils.bar(),
+                "  &7Progress: &8["+Utils.bar((float) Rarity.progress(v))+"&8] "+(rarity == Rarity.UNHOLY ? "&a&lMAX" : "&e"+rarity.getCombinePowerInRarity(v)+"/"+
+                        rarity.combinePowerRequired),
                 "&8&m                            "
                 )));
 
@@ -81,33 +91,69 @@ public class CombineItemListener implements Listener {
 
     public enum Rarity {
 
-        COMMON(2,2),
-        UNCOMMON(4,6),
-        RARE(7,13),
-        EPIC(18,31),
-        LEGENDARY(50,81),
-        MYTHIC(125,206),
-        GODLY(250,456),
-        UNHOLY(-1,456)
+        COMMON(1,2,3),
+        UNCOMMON(2,4,7),
+        RARE(3,7,14),
+        EPIC(4,18,32),
+        LEGENDARY(5,50,82),
+        MYTHIC(6,125,207),
+        GODLY(7,250,457),
+        UNHOLY(8,-1,457)
         ;
 
-        Rarity(int combinePowerRequired,int cumilitive) {
+        Rarity(int priority,int combinePowerRequired,int cumilitive) {
             this.combinePowerRequired = combinePowerRequired;
             this.cumilitive = cumilitive;
+            this.priority = priority;
         }
 
-        public final int combinePowerRequired,cumilitive;
+        public static final Rarity[] ordered = Arrays.stream(Rarity.values()).sorted(Comparator.comparingInt(x -> x.priority)).toArray(Rarity[]::new);
+
+        public final int combinePowerRequired,cumilitive,priority;
 
         private static final TreeMap<Integer,Rarity> rarity = new TreeMap<>();
 
         public static Rarity getRarity(int combinePowerRequired) {
-            return rarity.get(rarity.floorKey(combinePowerRequired));
+
+            if (combinePowerRequired == 457) return  Rarity.UNHOLY;
+
+            int v = rarity.floorKey(combinePowerRequired);
+            return v == combinePowerRequired ? next(rarity.get(v)) : rarity.get(v);
         }
 
         static {
             for (Rarity value : Rarity.values()) {
                 rarity.put(value.cumilitive,value);
             }
+        }
+
+        public static Rarity next(Rarity rarity) {
+            return switch (rarity) {
+                case COMMON -> UNCOMMON;
+                case UNCOMMON -> RARE;
+                case RARE -> EPIC;
+                case EPIC -> LEGENDARY;
+                case LEGENDARY -> MYTHIC;
+                case MYTHIC -> GODLY;
+                case GODLY, UNHOLY -> UNHOLY;
+            };
+        }
+
+        public double getCombinePowerInRarity(int combinePower) {
+
+            if (this == UNHOLY) return -1;
+
+            return this.cumilitive-combinePower;
+
+        }
+
+        public static double progress(int combinePower) {
+            Rarity rarity1 = getRarity(combinePower);
+
+            if (rarity1 == Rarity.UNHOLY) return 1;
+
+            double a = rarity1.getCombinePowerInRarity(combinePower);
+            return a/ (double) rarity1.combinePowerRequired;
         }
 
 
