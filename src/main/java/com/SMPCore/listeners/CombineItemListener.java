@@ -25,8 +25,11 @@ public class CombineItemListener implements Listener {
     public void onCraft(CraftItemEvent craftItemEvent) {
 
         ItemStack itemStack = craftItemEvent.getRecipe().getResult();
+        AbilityIntentionType abilityIntentionType = EventListener.getAbilityIntentionType(itemStack);
+        System.out.println("CRAFT>> 1_"+(abilityIntentionType != null ? abilityIntentionType.name() : "NO RESULT"));
 
-        if (EventListener.getAbilityIntentionType(itemStack) != null) {
+        if (abilityIntentionType != null) {
+            System.out.println("CRAFT>> 2");
             craftItemEvent.setCurrentItem(updateItem(itemStack,craftItemEvent.getWhoClicked() instanceof  Player player ?
                     player : null));
         }
@@ -37,15 +40,21 @@ public class CombineItemListener implements Listener {
     @EventHandler (ignoreCancelled = true,priority = EventPriority.MONITOR)
     public void onCombine(InventoryClickEvent inventoryClickEvent) {
 
+        System.out.println("COMBINE>> 1");
+
         ItemStack current = inventoryClickEvent.getCurrentItem(),cursor = inventoryClickEvent.getCursor();
 
         if (Utils.isNullorAir(current) || Utils.isNullorAir(cursor)) return;
 
+        System.out.println("COMBINE>> 2");
+
         AbilityIntentionType abilityIntentionType = EventListener.getAbilityIntentionType(current);
 
+        System.out.println("COMBINE>> 2A "+(abilityIntentionType != null ? abilityIntentionType.name() : "NO RESULT"));
         if (abilityIntentionType != null && current.getType() == cursor.getType() && abilityIntentionType ==
         EventListener.getAbilityIntentionType(cursor)) {
 
+            System.out.println("COMBINE>> 3");
             inventoryClickEvent.setCurrentItem(combineResult(current,cursor,inventoryClickEvent
                     .getWhoClicked() instanceof Player player ? player : null));
             inventoryClickEvent.setCursor(null);

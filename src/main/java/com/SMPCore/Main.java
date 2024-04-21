@@ -7,6 +7,7 @@ import com.SMPCore.commands.CmdClaim;
 import com.SMPCore.commands.CmdSkills;
 import com.SMPCore.commands.CmdWarps;
 import com.SMPCore.configs.CraftExpConfig;
+import com.SMPCore.listeners.CombineItemListener;
 import com.SMPCore.listeners.EventListener;
 import com.SMPCore.listeners.MobListener;
 import com.SMPCore.mining.DurabilityListener;
@@ -140,6 +141,7 @@ public class Main extends JavaPlugin {
 
         new DurabilityListener(this);
         getServer().getPluginManager().registerEvents(new SkillListener(),this);
+        getServer().getPluginManager().registerEvents(new CombineItemListener(),this);
 
     }
 
