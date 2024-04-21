@@ -61,11 +61,11 @@ public class AbilityMainMenu extends AbstractClickableGUI {
                                 .addLore("&7&m    &e Click to select a woodcutting or axe ability &7&m    ")
                                 .build()).build(false), new Button(22,guiClickEvent ->
                         openPage(new AbilitySelectorMenu(getPlayer(), AbilityIntentionType.AXE,this)),false)),
-                new ItemAssignedButton(new ItemBuilder(Material.IRON_AXE)
-                        .setGlowing(true).setDisplayName("&bWoodcutting & Melee Axe Abilities").setLore(DescriptionBuilder.init()
-                                .addLore("&7&m    &e Click to select a woodcutting or axe ability &7&m    ")
+                new ItemAssignedButton(new ItemBuilder(Material.FISHING_ROD)
+                        .setGlowing(true).setDisplayName("&bFishing Abilities").setLore(DescriptionBuilder.init()
+                                .addLore("&7&m    &e Click to select a fishing ability &7&m    ")
                                 .build()).build(false), new Button(23,guiClickEvent ->
-                        openPage(new AbilitySelectorMenu(getPlayer(), AbilityIntentionType.AXE,this)),false))
+                        openPage(new AbilitySelectorMenu(getPlayer(), AbilityIntentionType.FISHING,this)),false))
         );
 
         setupInventory();

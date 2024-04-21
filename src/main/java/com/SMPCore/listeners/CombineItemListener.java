@@ -3,12 +3,14 @@ package com.SMPCore.listeners;
 import com.MenuAPI.Utils;
 import com.SMPCore.skills.impl.AbilityIntentionType;
 import de.tr7zw.nbtapi.NBTItem;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.CraftItemEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -22,32 +24,44 @@ public class CombineItemListener implements Listener {
     @EventHandler (ignoreCancelled = true,priority = EventPriority.MONITOR)
     public void onCraft(CraftItemEvent craftItemEvent) {
 
-        if (craftItemEvent.getWhoClicked() instanceof Player player) {
+        ItemStack itemStack = craftItemEvent.getRecipe().getResult();
 
-            ItemStack itemStack = craftItemEvent.getRecipe().getResult();
-            NBTItem nbtItem = new NBTItem(itemStack);
-            nbtItem.setInteger("combinePower",1);
+        if (EventListener.getAbilityIntentionType(itemStack) != null) {
+            craftItemEvent.setCurrentItem(updateItem(itemStack,craftItemEvent.getWhoClicked() instanceof  Player player ?
+                    player : null));
+        }
 
+    }
+
+
+    @EventHandler (ignoreCancelled = true,priority = EventPriority.MONITOR)
+    public void onCombine(InventoryClickEvent inventoryClickEvent) {
+
+        ItemStack current = inventoryClickEvent.getCurrentItem(),cursor = inventoryClickEvent.getCursor();
+
+        if (Utils.isNullorAir(current) || Utils.isNullorAir(cursor)) return;
+
+        AbilityIntentionType abilityIntentionType = EventListener.getAbilityIntentionType(current);
+
+        if (abilityIntentionType != null && current.getType() == cursor.getType() && abilityIntentionType ==
+        EventListener.getAbilityIntentionType(cursor)) {
+
+            inventoryClickEvent.setCurrentItem(combineResult(current,cursor,inventoryClickEvent
+                    .getWhoClicked() instanceof Player player ? player : null));
+            inventoryClickEvent.setCursor(null);
 
         }
 
     }
 
-    public static ItemStack combineResult(ItemStack itemStack1,ItemStack itemStack2) {
-        Map<Enchantment,Integer> enchants1 = itemStack1.getEnchantments(),enchants2 = itemStack2.getEnchantments();
-        enchants2.forEach((enchantment, integer) -> enchants1.put(enchantment,Math.max(enchants1.getOrDefault(enchantment,0),integer)));
+    public static ItemStack updateItem(ItemStack itemStack,Player crafter) {
 
-        NBTItem nbtItem1 = new NBTItem(itemStack1),nbtItem2 = new NBTItem(itemStack2);
-        int v = (nbtItem1.hasKey("combinePower") ? nbtItem1
-                .getInteger("combinePower") : 1)+(nbtItem2.hasKey("combinePower") ? nbtItem2
-                .getInteger("combinePower") : 1);
+        if (Utils.isNullorAir(itemStack)) return null;
+
+        NBTItem nbtItem = new NBTItem( itemStack);
+        int v = nbtItem.hasKey("combinePower") ? nbtItem.getInteger("combinePower") : 1;
         Rarity rarity = Rarity.getRarity(v);
         double a = 100+rarity.priority*10D;
-        nbtItem1.setInteger("combinePower",v);
-        nbtItem1.setDouble("power",a);
-
-
-        ItemStack itemStack = nbtItem1.getItem();
 
         ItemMeta meta = itemStack.getItemMeta();
 
@@ -63,7 +77,6 @@ public class CombineItemListener implements Listener {
                     case RANGED_COMBAT -> "Pierce Chance: &a"+((a-100)*0.5)+"%";
                     default -> "";
                 },
-                "",
                 "  &7Rarity: "+switch (rarity) {
                     case COMMON -> "&7Common";
                     case UNCOMMON -> "&eUncommon";
@@ -76,8 +89,29 @@ public class CombineItemListener implements Listener {
                 },
                 "  &7Progress: &8["+Utils.bar((float) Rarity.progress(v))+"&8] "+(rarity == Rarity.UNHOLY ? "&a&lMAX" : "&e"+rarity.getCombinePowerInRarity(v)+"/"+
                         rarity.combinePowerRequired),
+                PlaceholderAPI.setPlaceholders(crafter,"  &7&lCrafted by: "+(crafter != null ? "%katsu_player_"+crafter.getName()+"% "+crafter.getName() : "Server")),
                 "&8&m                            "
-                )));
+        )));
+
+        itemStack.setItemMeta(meta);
+        return itemStack;
+    }
+
+    public static ItemStack combineResult(ItemStack itemStack1,ItemStack itemStack2,Player crafter) {
+        Map<Enchantment,Integer> enchants1 = itemStack1.getEnchantments(),enchants2 = itemStack2.getEnchantments();
+        enchants2.forEach((enchantment, integer) -> enchants1.put(enchantment,Math.max(enchants1.getOrDefault(enchantment,0),integer)));
+
+        NBTItem nbtItem1 = new NBTItem(itemStack1),nbtItem2 = new NBTItem(itemStack2);
+        int v = (nbtItem1.hasKey("combinePower") ? nbtItem1
+                .getInteger("combinePower") : 1)+(nbtItem2.hasKey("combinePower") ? nbtItem2
+                .getInteger("combinePower") : 1);
+        Rarity rarity = Rarity.getRarity(v);
+        double a = 100+rarity.priority*10D;
+        nbtItem1.setInteger("combinePower",v);
+        nbtItem1.setDouble("power",a);
+
+
+        ItemStack itemStack = updateItem(nbtItem1.getItem(),crafter);
 
         itemStack.addUnsafeEnchantments(enchants1);
 
