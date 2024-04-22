@@ -1,6 +1,7 @@
 package com.SMPCore.listeners;
 
 import com.MenuAPI.Utils;
+import com.SMPCore.Events.FarmHarvestEvent;
 import com.SMPCore.skills.impl.AbilityIntentionType;
 import de.tr7zw.nbtapi.NBTItem;
 import me.clip.placeholderapi.PlaceholderAPI;
@@ -20,6 +21,11 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class CombineItemListener implements Listener {
+
+    @EventHandler
+    public void onFarm(FarmHarvestEvent farmHarvestEvent) {
+
+    }
 
     @EventHandler (ignoreCancelled = true,priority = EventPriority.MONITOR)
     public void onCraft(CraftItemEvent craftItemEvent) {
@@ -98,7 +104,7 @@ public class CombineItemListener implements Listener {
                 },
                 "  &7Progress: &8["+Utils.bar((float) Rarity.progress(v))+"&8] "+(rarity == Rarity.UNHOLY ? "&a&lMAX" : "&e"+rarity.getCombinePowerInRarity(v)+"/"+
                         rarity.combinePowerRequired),
-                PlaceholderAPI.setPlaceholders(crafter,"  &7&lCrafted by: "+(crafter != null ? "%katsu_player_"+crafter.getName()+"% "+crafter.getName() : "Server")),
+                PlaceholderAPI.setPlaceholders(crafter,"  &7&lCrafted by: "+(crafter != null ? "%katsu_player_"+crafter.getName()+"_small% "+crafter.getName() : "Server")),
                 "&8&m                            "
         )));
 
