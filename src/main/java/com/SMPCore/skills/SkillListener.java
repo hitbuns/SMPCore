@@ -6,6 +6,7 @@ import com.SMPCore.Events.ExpIdExpGainEvent;
 import com.SMPCore.Events.ExpIdLevelUpEvent;
 import com.SMPCore.Events.FarmHarvestEvent;
 import com.SMPCore.Utilities.TempEntityDataHandler;
+import com.SMPCore.configs.BlockDataConfig;
 import com.SMPCore.listeners.EventListener;
 import com.SMPCore.mining.CustomBlockBreakEvent;
 import com.SMPCore.skills.impl.AbilityIntentionType;
@@ -21,11 +22,12 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.Bamboo;
 import org.bukkit.block.data.type.Cocoa;
 import org.bukkit.block.data.type.PitcherCrop;
+import org.bukkit.craftbukkit.v1_20_R3.block.CraftBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.*;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
@@ -33,6 +35,29 @@ import java.util.List;
 import java.util.Objects;
 
 public class SkillListener implements Listener {
+
+    @EventHandler (ignoreCancelled = true,priority = EventPriority.MONITOR)
+    public void onPlace(BlockPlaceEvent blockPlaceEvent) {
+
+        BlockDataConfig.Instance.saveBlock(blockPlaceEvent.getBlock());
+
+    }
+
+    @EventHandler
+    public void onPistonMove(BlockPistonExtendEvent blockPistonEvent) {
+        BlockDataConfig.Instance.saveBlock(blockPistonEvent.getBlock());
+    }
+
+    @EventHandler
+    public void onPistonMove(BlockPistonRetractEvent blockPistonEvent) {
+        BlockDataConfig.Instance.saveBlock(blockPistonEvent.getBlock());
+    }
+
+
+    @EventHandler (ignoreCancelled = true,priority = EventPriority.MONITOR)
+    public void onBlockBreak(BlockBreakEvent blockBreakEvent) {
+        BlockDataConfig.Instance.removeBlock(blockBreakEvent.getBlock());
+    }
 
     @EventHandler (priority = EventPriority.MONITOR)
     public void onMining(CustomBlockBreakEvent customBlockBreakEvent) {
@@ -50,6 +75,21 @@ public class SkillListener implements Listener {
 //                .block.getDrops(itemStack,customBlockBreakEvent.player)).stream().filter(Objects::nonNull).forEach(itemStack1 ->
 //                world.dropItemNaturally(customBlockBreakEvent.block.getLocation(),itemStack1.clone()));
 
+        AbilityIntentionType.allPerks.forEach((s, skillPerk) -> skillPerk.onEvent(customBlockBreakEvent, customBlockBreakEvent.player));
+
+        if (material.name().endsWith("_WOOD") && BlockDataConfig.Instance.isBlockEncoded(customBlockBreakEvent.block)) {
+
+            double v = 5;
+
+            PlayerDataHandler.addExp(customBlockBreakEvent.player, NonCombatStatType.WOODCUTTING, ExpReason.GRIND, v);
+
+            TempEntityDataHandler.getorAdd(customBlockBreakEvent.player).updateData("rageCurrent",Double.class,initial ->
+                    Math.max(0,Math.min(initial+v/10,100)),0D);
+
+            return;
+        }
+
+
         if (material.name().endsWith("_ORE") || material.name().contains("STONE")) {
             double v = switch (material) {
                 case COAL_ORE, DEEPSLATE_COAL_ORE -> 30;
@@ -62,8 +102,6 @@ public class SkillListener implements Listener {
                 case STONE, COBBLESTONE -> 1;
                 default -> 0;
             };
-
-            AbilityIntentionType.allPerks.forEach((s, skillPerk) -> skillPerk.onEvent(customBlockBreakEvent, customBlockBreakEvent.player));
 
             PlayerDataHandler.addExp(customBlockBreakEvent.player, NonCombatStatType.MINING, ExpReason.GRIND, v);
 
@@ -133,8 +171,8 @@ public class SkillListener implements Listener {
 
         PlayerDataHandler.addExp(player,NonCombatStatType.FARMING,ExpReason.GRIND,Math.max(0,farmHarvestEvent.exp));
 
-        block.getDrops(player.getInventory().getItemInMainHand()).stream().filter(itemStack -> !Utils.isNullorAir(itemStack)).peek(itemStack -> itemStack.setAmount((int) Math.round(Math.max(0,itemStack
-                .getAmount()*0.05*farmHarvestEvent.amountMultiplier*PlayerDataHandler.getLevel(player,NonCombatStatType.FARMING))))).filter(itemStack -> itemStack.getAmount() >= 1).forEach(
+        block.getDrops(player.getInventory().getItemInMainHand()).stream().filter(itemStack -> !Utils.isNullorAir(itemStack)).peek(itemStack -> itemStack.setAmount((int) Math.round(Math.max(0,(itemStack
+                .getAmount()*farmHarvestEvent.amountMultiplier*(1+0.05*PlayerDataHandler.getLevel(player,NonCombatStatType.FARMING)))-1)))).filter(itemStack -> itemStack.getAmount() >= 1).forEach(
                         itemStack -> block.getWorld().dropItemNaturally(block.getLocation(),itemStack)
         );
 

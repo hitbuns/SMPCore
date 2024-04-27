@@ -6,6 +6,7 @@ import com.SMPCore.commands.CmdAbility;
 import com.SMPCore.commands.CmdClaim;
 import com.SMPCore.commands.CmdSkills;
 import com.SMPCore.commands.CmdWarps;
+import com.SMPCore.configs.BlockDataConfig;
 import com.SMPCore.configs.CraftExpConfig;
 import com.SMPCore.listeners.CombineItemListener;
 import com.SMPCore.listeners.EventListener;
@@ -22,8 +23,10 @@ import com.earth2me.essentials.Essentials;
 import com.github.fierioziy.particlenativeapi.api.ParticleNativeAPI;
 import com.github.fierioziy.particlenativeapi.api.particle.type.ParticleType;
 import com.github.fierioziy.particlenativeapi.core.ParticleNativeCore;
+import net.luckperms.api.LuckPerms;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Arrays;
@@ -72,6 +75,7 @@ public class Main extends JavaPlugin {
 
         CombatStatType.init();
         NonCombatStatType.init();
+        BlockDataConfig.init(this);
 
         Bukkit.getWorlds().forEach(world -> world.getLivingEntities().stream().filter(Entity::isCustomNameVisible)
                 .forEach(Entity::remove));
@@ -115,8 +119,16 @@ public class Main extends JavaPlugin {
         registerCommands();
         registerListeners();
 
+        RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
+        if (provider != null) {
+            api = provider.getProvider();
+
+        }
+
 
     }
+
+    public static LuckPerms api;
 
     @Override
     public void onDisable() {

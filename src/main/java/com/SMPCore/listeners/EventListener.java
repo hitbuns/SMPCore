@@ -7,6 +7,7 @@ import com.MenuAPI.Utilities.FormattedNumber;
 import com.MenuAPI.Utils;
 import com.SMPCore.Events.DropTriggerEvent;
 import com.SMPCore.Events.TickedSMPEvent;
+import com.SMPCore.Main;
 import com.SMPCore.Utilities.CooldownHandler;
 import com.SMPCore.Utilities.TempEntityDataHandler;
 import com.SMPCore.configs.CraftExpConfig;
@@ -22,6 +23,10 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.world.World;
 import de.tr7zw.nbtapi.NBTItem;
+import me.clip.placeholderapi.PlaceholderAPI;
+import net.luckperms.api.LuckPerms;
+import net.luckperms.api.query.QueryMode;
+import net.luckperms.api.query.QueryOptions;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -76,12 +81,16 @@ public class EventListener implements Listener {
     }
 
 
-    @EventHandler
+
+    @EventHandler (priority = EventPriority.MONITOR)
     public void onChat(AsyncPlayerChatEvent playerChatEvent) {
+        if (playerChatEvent.isCancelled()) return;
+
+
         final String[] message = {playerChatEvent.getMessage()};
         Player[] players = Bukkit.getOnlinePlayers().stream().filter(player -> {
             if (message[0].contains(player.getName())) {
-                message[0] = message[0].replace(player.getName(),"@"+player.getName());
+                message[0] = message[0].replace(player.getName(), PlaceholderAPI.setPlaceholders(player,"%katsu_player_"+player.getName()+"_small%")+" @"+player.getName());
                 return true;
             }
 
@@ -90,6 +99,20 @@ public class EventListener implements Listener {
 
         SoundAPI.playSound("notification_pling",players);
         playerChatEvent.setMessage(message[0]);
+
+//
+//
+//        Main.Instance.getServer().getLogger().info("TEST_!@#$3");
+//
+//        Main.Instance.getServer().getLogger().info(playerChatEvent.getFormat());
+        Player yapper = playerChatEvent.getPlayer();
+        String s = Utils.color(PlaceholderAPI.setPlaceholders(yapper, "%katsu_player_"+yapper.getName()+"_small%"
+        )+" "+ Main.api.getGroupManager().getGroup(Main.api.getUserManager().getUser(yapper.getUniqueId()).getPrimaryGroup())
+                .getCachedData().getMetaData().getPrefix()+" &6%s &8➢ &e%s");
+        playerChatEvent.setFormat(String.format(s,yapper.getDisplayName(),message[0]));
+//
+//        Main.Instance.getServer().getLogger().info("TEST_!@#$4");
+//        Main.Instance.getServer().getLogger().info(playerChatEvent.getFormat());
 
     }
 

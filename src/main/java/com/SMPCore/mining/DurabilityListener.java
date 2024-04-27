@@ -2,6 +2,7 @@ package com.SMPCore.mining;
 
 import com.MenuAPI.Utils;
 import com.SMPCore.mobs.EquipmentHandler;
+import de.tr7zw.nbtapi.NBTItem;
 import net.minecraft.server.level.EntityPlayer;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -128,6 +129,13 @@ public class DurabilityListener implements Listener {
             case NETHERITE -> 3.2;
             default -> 0;
         } : 0) )*(1+0.25*(Utils.isNullorAir(itemStack) ? 0 : itemStack.getEnchantmentLevel(Enchantment.DIG_SPEED)));
+
+        if (itemStack != null && itemStack.getType() != Material.AIR) {
+
+            NBTItem nbtItem = new NBTItem(itemStack);
+            multiplier *= nbtItem.getDouble("power")/100;
+
+        }
 
         brokenBlockHandlerList.getBrokenBlock(blockPosition).incrementDamage(player, multiplier*(1+0.2*(player.hasPotionEffect(
                 PotionEffectType.FAST_DIGGING
