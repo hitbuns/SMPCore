@@ -9,6 +9,7 @@ import com.SMPCore.mobs.MobModifierType;
 import com.SMPCore.mobs.MobType;
 import com.SMPCore.mobs.MobTypeContainer;
 import com.SMPCore.skills.impl.AbilityIntentionType;
+import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
@@ -18,10 +19,27 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.*;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.concurrent.TimeUnit;
 
 public class MobListener implements Listener {
+
+    @EventHandler (priority = EventPriority.MONITOR,ignoreCancelled = true)
+    public void onAxeDamage(EntityDamageByEntityEvent entityDamageByEntityEvent) {
+
+        if (entityDamageByEntityEvent.getDamager() instanceof Player player) {
+
+            ItemStack itemStack = player.getInventory().getItemInMainHand();
+
+            if (EventListener.getAbilityIntentionType(itemStack) != AbilityIntentionType.AXE) return;
+
+            NBTItem nbtItem = new NBTItem(itemStack);
+            entityDamageByEntityEvent.setDamage(entityDamageByEntityEvent.getDamage()*((nbtItem.getDouble("power")-100)/100));
+
+        }
+
+    }
 
     @EventHandler (priority = EventPriority.HIGHEST,ignoreCancelled = true)
     public void onLaunchProjectile(EntityDamageByEntityEvent entityDamageByEntityEvent) {
@@ -121,32 +139,6 @@ public class MobListener implements Listener {
     @EventHandler (priority = EventPriority.MONITOR,ignoreCancelled = true)
     public void onDamage(EntityDamageEvent entityDamageEvent) {
 
-        if (entityDamageEvent.getEntity() instanceof LivingEntity livingEntity) {
-
-            if (livingEntity instanceof Player player) AbilityIntentionType.allPerks.forEach((s, skillPerk) -> skillPerk.onEvent(entityDamageEvent, player));
-
-
-            if (TempEntityDataHandler.getorAdd(livingEntity).playerCooldownHandler.isOnCoolDown("vanilla_spawn",
-                    TimeUnit.MILLISECONDS,5*50L)) {
-                entityDamageEvent.setCancelled(true);
-                return;
-            }
-
-            MobType mobType = MobType.getMobType(livingEntity);
-            MobModifierType mobModifierType = MobType.getMobTypeModifier(livingEntity);
-
-            if (mobType != null) {
-
-                mobType.eventHook.onEvent(entityDamageEvent,
-                        livingEntity);
-
-            }
-
-            if (mobModifierType != null) mobModifierType.eventHook.onEvent(entityDamageEvent,livingEntity);
-
-
-        }
-
         if (entityDamageEvent instanceof EntityDamageByEntityEvent entityDamageByEntityEvent) {
 
 
@@ -171,6 +163,35 @@ public class MobListener implements Listener {
 
         }
 
+        if (entityDamageEvent.getEntity() instanceof LivingEntity livingEntity) {
+
+            if (livingEntity instanceof Player player) AbilityIntentionType.allPerks.forEach((s, skillPerk) -> skillPerk.onEvent(entityDamageEvent, player));
+
+
+            if (TempEntityDataHandler.getorAdd(livingEntity).playerCooldownHandler.isOnCoolDown("vanilla_spawn",
+                    TimeUnit.MILLISECONDS,5*50L)) {
+                entityDamageEvent.setCancelled(true);
+                return;
+            }
+
+            MobType mobType = MobType.getMobType(livingEntity);
+            MobModifierType mobModifierType = MobType.getMobTypeModifier(livingEntity);
+
+
+            if (mobModifierType != null) mobModifierType.eventHook.onEvent(entityDamageEvent,livingEntity);
+
+            if (mobType != null) {
+
+                mobType.eventHook.onEvent(entityDamageEvent,
+                        livingEntity);
+
+                MobUtils.updateEntity(livingEntity,livingEntity.getHealth()-entityDamageEvent.getFinalDamage());
+            }
+
+
+        }
+
+
 
     }
 
@@ -187,15 +208,16 @@ public class MobListener implements Listener {
                         MobType mobType = MobType.getMobType(livingEntity);
                         MobModifierType mobModifierType = MobType.getMobTypeModifier(livingEntity);
 
-                        if (mobType != null) {
-
-                                mobType.eventHook.onEvent(tickedSMPEvent,
-                                        livingEntity);
-
-                        }
 
                         if (mobModifierType != null) mobModifierType.eventHook.onEvent(tickedSMPEvent,livingEntity);
 
+                        if (mobType != null) {
+
+                            mobType.eventHook.onEvent(tickedSMPEvent,
+                                    livingEntity);
+                            MobUtils.updateEntity(livingEntity);
+
+                        }
 
                     }));
     }

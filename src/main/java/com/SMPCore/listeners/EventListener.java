@@ -2,6 +2,7 @@ package com.SMPCore.listeners;
 
 import be.razerstorm.customcrafting.events.PushRecipeToServerEvent;
 import be.razerstorm.customcrafting.events.RecipeRemoveEvent;
+import com.MenuAPI.ArmorType;
 import com.MenuAPI.Utilities.BukkitEventCaller;
 import com.MenuAPI.Utilities.FormattedNumber;
 import com.MenuAPI.Utils;
@@ -51,6 +52,7 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.CraftingRecipe;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
@@ -327,7 +329,7 @@ public class EventListener implements Listener {
 
         AbilityIntentionType abilityIntentionType = getAbilityIntentionType(itemStack);
 
-        if (abilityIntentionType == null) return;
+        if (abilityIntentionType == null || abilityIntentionType == AbilityIntentionType.DEFENSE_PASSIVE) return;
 
         if (AbilityIntentionType.allPerks.get(PlayerDataHandler.getPlayerData(player).getString("ability_"+abilityIntentionType
                 .name()+"_"+(sneak ? "SECONDARY" : "PRIMARY")))  instanceof AbilitySkillPerk abilitySkillPerk) {
@@ -339,12 +341,16 @@ public class EventListener implements Listener {
     }
 
     public static AbilityIntentionType getAbilityIntentionType(ItemStack itemStack) {
+
+        if (Utils.isNullorAir(itemStack)) return null;
+
         String material = itemStack.getType().name();
 
         return material.contains("_PICKAXE") ? AbilityIntentionType.MINING : material.contains("_AXE") ?
                 AbilityIntentionType.AXE : material.contains("_SWORD") ? AbilityIntentionType.SWORD : material.contains("_HOE") ? AbilityIntentionType.FARMING :
                 itemStack.getType() == Material.BOW || itemStack.getType() == Material.CROSSBOW ? AbilityIntentionType.RANGED_COMBAT : itemStack.getType() == Material.ENCHANTED_BOOK ?
-                        AbilityIntentionType.ENCHANTING : null;
+                        AbilityIntentionType.ENCHANTING : itemStack.getType() == Material.SHIELD || Arrays.stream(ArmorType.values()).anyMatch(armorType -> material.endsWith("_"+armorType.name())) ? AbilityIntentionType.DEFENSE_PASSIVE
+                                : null;
     }
 
 

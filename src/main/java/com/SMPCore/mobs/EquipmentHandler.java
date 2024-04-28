@@ -148,7 +148,7 @@ public class EquipmentHandler {
                         .anyMatch(intention -> intention == Intention.ARMOR))
                 .sorted((o1, o2) -> Integer.compare(o2.priority,o1.priority)).toArray(Material[]::new);
         final Intention[] intentions;
-        final int priority;
+        public final int priority;
 
         Material(int priority,Intention... intentions) {
             this.priority = priority;
