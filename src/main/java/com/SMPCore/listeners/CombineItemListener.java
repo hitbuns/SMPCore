@@ -58,15 +58,15 @@ public class CombineItemListener implements Listener {
             Player[] players = Bukkit.getOnlinePlayers().toArray(Player[]::new);
 
             ParticleUtils.arc(location -> Main.Instance.getParticleNativeAPI().LIST_1_13.DUST.color(Color.fromRGB(217, 169, 26),1)
-                    .packet(true,location),player.getLocation().clone().add(0,0.25,0),player.getEyeLocation().getDirection(),45,3,50,radius/3,
+                    .packet(true,location),player.getLocation().clone().add(0,0.4,0),player.getEyeLocation().getDirection(),45,3,50,radius/3,
                     players);
 
             ParticleUtils.arc(location -> Main.Instance.getParticleNativeAPI().LIST_1_13.DUST.color(Color.fromRGB(217, 185, 26),1)
-                            .packet(true,location),player.getLocation().clone().add(0,0.4,0),player.getEyeLocation().getDirection(),45,3,50,radius*2/3,
+                            .packet(true,location),player.getLocation().clone().add(0,0.6,0),player.getEyeLocation().getDirection(),45,3,50,radius*2/3,
                     players);
 
             ParticleUtils.arc(location -> Main.Instance.getParticleNativeAPI().LIST_1_13.DUST.color(Color.fromRGB(192, 217, 26),1)
-                            .packet(true,location),player.getLocation().clone().add(0,0.55,0),player.getEyeLocation().getDirection(),45,3,50,radius,
+                            .packet(true,location),player.getLocation().clone().add(0,0.8,0),player.getEyeLocation().getDirection(),45,3,50,radius,
                     players);
 
             LivingEntity[ ] livingEntities = ParticleUtils.getEntitiesInAngle(player, 45, radius);
@@ -286,7 +286,7 @@ public class CombineItemListener implements Listener {
                     case UNHOLY -> "&4Unholy";
                 },
                 "  &7Progress: &8["+Utils.bar(f)+"&8] "+(rarity == Rarity.UNHOLY ? "&a&lMAX" : "&e"+ FormattedNumber.getInstance().getCommaFormattedNumber(f*100,1)+"%"),
-                PlaceholderAPI.setPlaceholders(crafter,"  &7&oCrafted by "+(crafter != null ? "%katsu_player_"+crafter.getName()+"_small% &7&o"+crafter.getName() : "Server")),
+                "  &7&oCrafted by "+(crafter != null ? "%katsu_player_"+crafter.getName()+"_small% &7&o"+crafter.getName() : "Server"),
                 "&8&m                                           "
         ));
 
@@ -297,7 +297,7 @@ public class CombineItemListener implements Listener {
                             +"% &9PVE Dmg Reduction \uD83D\uDEE1"));
         }
 
-        meta.setLore(Utils.color(lore));
+        meta.setLore(Utils.color(crafter,lore));
 
 
         itemStack.setItemMeta(meta);

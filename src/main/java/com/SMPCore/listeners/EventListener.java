@@ -108,9 +108,9 @@ public class EventListener implements Listener {
 //
 //        Main.Instance.getServer().getLogger().info(playerChatEvent.getFormat());
         Player yapper = playerChatEvent.getPlayer();
-        String s = Utils.color(PlaceholderAPI.setPlaceholders(yapper, "%katsu_player_"+yapper.getName()+"_small%"
-        )+" "+ Main.api.getGroupManager().getGroup(Main.api.getUserManager().getUser(yapper.getUniqueId()).getPrimaryGroup())
-                .getCachedData().getMetaData().getPrefix()+" &6%s &8➢ &e%s");
+        String s = Utils.color(yapper,"%katsu_player_"+yapper.getName()+"_small%"
+        +" "+ Main.api.getGroupManager().getGroup(Main.api.getUserManager().getUser(yapper.getUniqueId()).getPrimaryGroup())
+                .getCachedData().getMetaData().getPrefix()+" &6%s &8➢ &e%s",false);
         playerChatEvent.setFormat(String.format(s,yapper.getDisplayName(),message[0]));
 //
 //        Main.Instance.getServer().getLogger().info("TEST_!@#$4");
