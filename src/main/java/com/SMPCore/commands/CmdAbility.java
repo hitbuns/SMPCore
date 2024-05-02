@@ -2,7 +2,6 @@ package com.SMPCore.commands;
 
 import com.MenuAPI.Utils;
 import com.SMPCore.skills.gui.AbilityMainMenu;
-import com.SMPCore.skills.gui.AbilitySelectorMenu;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

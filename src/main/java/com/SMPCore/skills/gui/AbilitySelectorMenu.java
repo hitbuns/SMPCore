@@ -13,20 +13,16 @@ import com.SMPCore.skills.AbilityMessageConfig;
 import com.SMPCore.skills.AbilitySkillPerk;
 import com.SMPCore.skills.PlayerDataHandler;
 import com.SMPCore.skills.impl.AbilityIntentionType;
-import com.SMPCore.skills.impl.NonCombatStatType;
 import com.SMPCore.skills.impl.iPerkContainer;
-import com.github.sirblobman.api.configuration.PlayerDataManager;
 import com.mongodb.client.model.Updates;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bson.Document;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class AbilitySelectorMenu extends AbstractModifiableListMenu<AbilitySkillPerk> {
 

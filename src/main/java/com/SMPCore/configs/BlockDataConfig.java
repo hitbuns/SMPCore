@@ -6,8 +6,6 @@ import org.bukkit.block.Block;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
-import java.io.File;
-
 public class BlockDataConfig extends Config {
 
     public static BlockDataConfig Instance;
