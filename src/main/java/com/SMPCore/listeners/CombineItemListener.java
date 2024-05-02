@@ -159,7 +159,10 @@ public class CombineItemListener implements Listener {
 
             playerFishEvent.setCancelled(true);
 
-            RewardsAPI.rewardPlayer(player,"fishing",1+PlayerDataHandler.getLevel(player,NonCombatStatType.FISHING)*0.5);
+            NBTItem nbtItem = new NBTItem(itemStack);
+            double value = nbtItem.hasKey("power") ? nbtItem.getDouble("power")/100 : 0;
+
+            RewardsAPI.rewardPlayer(player,"fishing",(1+PlayerDataHandler.getLevel(player,NonCombatStatType.FISHING)*0.5)*value);
 
         }
 
