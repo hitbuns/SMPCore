@@ -342,7 +342,7 @@ public class EventListener implements Listener {
 
         String material = itemStack.getType().name();
 
-        return material.contains("_PICKAXE") ? AbilityIntentionType.MINING : material.contains("_AXE") ?
+        return material.contains("_SHOVEL") ? AbilityIntentionType.EXCAVATION : material.contains("_PICKAXE") ? AbilityIntentionType.MINING : material.contains("_AXE") ?
                 AbilityIntentionType.AXE : material.contains("_SWORD") ? AbilityIntentionType.SWORD : material.contains("_HOE") ? AbilityIntentionType.FARMING :
                 itemStack.getType() == Material.BOW || itemStack.getType() == Material.CROSSBOW ? AbilityIntentionType.RANGED_COMBAT : itemStack.getType() == Material.ENCHANTED_BOOK ?
                         AbilityIntentionType.ENCHANTING : itemStack.getType() == Material.SHIELD || Arrays.stream(ArmorType.values()).anyMatch(armorType -> material.endsWith("_"+armorType.name())) ? AbilityIntentionType.DEFENSE_PASSIVE
