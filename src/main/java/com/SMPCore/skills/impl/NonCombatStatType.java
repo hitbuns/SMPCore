@@ -21,7 +21,7 @@ public enum NonCombatStatType implements PlayerDataHandler.ExpId,iPerkContainer 
     CRAFTING("&3Crafting"),
     ENCHANTING("&4Enchanting"),
     SMITHING("&dSmithing"),
-    BARTER("&7Bartering")
+    EXCAVATION("&3Excavation")
     ;
 
     NonCombatStatType(String displayKey) {

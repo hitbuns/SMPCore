@@ -54,18 +54,23 @@ public class AbilityMainMenu extends AbstractClickableGUI {
                 new ItemAssignedButton(new ItemBuilder(Material.ENCHANTED_BOOK)
                         .setGlowing(true).setDisplayName("&bEnchanting Abilities").setLore(DescriptionBuilder.init()
                                 .addLore("&7&m    &e Click to select a enchanting ability &7&m    ")
-                                .build()).build(false), new Button(21,guiClickEvent ->
+                                .build()).build(false), new Button(20,guiClickEvent ->
                         openPage(new AbilitySelectorMenu(getPlayer(), AbilityIntentionType.ENCHANTING,this)),false)),
                 new ItemAssignedButton(new ItemBuilder(Material.IRON_AXE)
                         .setGlowing(true).setDisplayName("&bWoodcutting & Melee Axe Abilities").setLore(DescriptionBuilder.init()
                                 .addLore("&7&m    &e Click to select a woodcutting or axe ability &7&m    ")
-                                .build()).build(false), new Button(22,guiClickEvent ->
+                                .build()).build(false), new Button(21,guiClickEvent ->
                         openPage(new AbilitySelectorMenu(getPlayer(), AbilityIntentionType.AXE,this)),false)),
                 new ItemAssignedButton(new ItemBuilder(Material.FISHING_ROD)
                         .setGlowing(true).setDisplayName("&bFishing Abilities").setLore(DescriptionBuilder.init()
                                 .addLore("&7&m    &e Click to select a fishing ability &7&m    ")
                                 .build()).build(false), new Button(23,guiClickEvent ->
-                        openPage(new AbilitySelectorMenu(getPlayer(), AbilityIntentionType.FISHING,this)),false))
+                        openPage(new AbilitySelectorMenu(getPlayer(), AbilityIntentionType.FISHING,this)),false)),
+                new ItemAssignedButton(new ItemBuilder(Material.DIAMOND_SHOVEL)
+                        .setGlowing(true).setDisplayName("&bExcavating Abilities").setLore(DescriptionBuilder.init()
+                                .addLore("&7&m    &e Click to select a excavating ability &7&m    ")
+                                .build()).build(false), new Button(24,guiClickEvent ->
+                        openPage(new AbilitySelectorMenu(getPlayer(), AbilityIntentionType.EXCAVATION,this)),false))
         );
 
         setupInventory();

@@ -114,12 +114,12 @@ public class SkillGUI extends AbstractClickableGUI {
                                 FormattedNumber.getInstance().getCommaFormattedNumber(PlayerDataHandler
                                         .getExp(player,NonCombatStatType.SMITHING, PlayerDataHandler.ExpType.GOAL),1)+")").build()).build(false));
         getInventory().setItem(24,new ItemBuilder(Material.WRITABLE_BOOK)
-                .setDisplayName("&aBartering Lvl. &b"+PlayerDataHandler.getLevel(player, NonCombatStatType.BARTER)).setGlowing(true).setLore(DescriptionBuilder.init()
+                .setDisplayName("&aExcavation Lvl. &b"+PlayerDataHandler.getLevel(player, NonCombatStatType.EXCAVATION)).setGlowing(true).setLore(DescriptionBuilder.init()
                         .addLore("&7("+
                                 FormattedNumber.getInstance().getCommaFormattedNumber(PlayerDataHandler
-                                        .getExp(player,NonCombatStatType.BARTER, PlayerDataHandler.ExpType.CURRENT),1)+"/"+
+                                        .getExp(player,NonCombatStatType.EXCAVATION, PlayerDataHandler.ExpType.CURRENT),1)+"/"+
                                 FormattedNumber.getInstance().getCommaFormattedNumber(PlayerDataHandler
-                                        .getExp(player,NonCombatStatType.BARTER, PlayerDataHandler.ExpType.GOAL),1)+")").build()).build(false));
+                                        .getExp(player,NonCombatStatType.EXCAVATION, PlayerDataHandler.ExpType.GOAL),1)+")").build()).build(false));
 
         getInventory().setItem(22,new ItemBuilder(Material.SHIELD).setGlowing(true).setDisplayName("&eClick to view combat skills!").build(false));
 

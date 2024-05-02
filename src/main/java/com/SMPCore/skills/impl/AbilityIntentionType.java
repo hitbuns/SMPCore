@@ -18,7 +18,8 @@ public enum AbilityIntentionType {
     DEFENSE_PASSIVE(CombatStatType.DEFENSE),
     ENCHANTING(NonCombatStatType.ENCHANTING),
     AXE(CombatStatType.STRENGTH,NonCombatStatType.WOODCUTTING),
-    FISHING(NonCombatStatType.FISHING)
+    FISHING(NonCombatStatType.FISHING),
+    EXCAVATION(NonCombatStatType.EXCAVATION)
 
 
     ;
