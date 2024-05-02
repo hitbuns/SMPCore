@@ -292,6 +292,7 @@ public class CombineItemListener implements Listener {
 
         List<String> lore = new ArrayList<>(Arrays.asList("&8&m============================",
                 switch (abilityIntentionType) {
+                    case EXCAVATION -> "&7  Digging Speed: "+a+"%";
                     case MINING -> "&7  Mining Speed: "+a+"%"; //D
                     case AXE -> "&7  Axe Power: &a"+a+"%"; //D
                     case SWORD -> "&7  Sweep Radius: &a"+a+"%";
