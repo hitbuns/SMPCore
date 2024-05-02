@@ -4,6 +4,7 @@ import com.MenuAPI.ItemAdder;
 import com.MenuAPI.Utilities.FormattedNumber;
 import com.MenuAPI.Utils;
 import com.SMPCore.Events.FarmHarvestEvent;
+import com.SMPCore.LootTableSystem.RewardsAPI;
 import com.SMPCore.Main;
 import com.SMPCore.Utilities.ParticleUtils;
 import com.SMPCore.configs.CraftExpConfig;
@@ -31,6 +32,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
@@ -139,6 +141,26 @@ public class CombineItemListener implements Listener {
 
             farmHarvestEvent.amountMultiplier *= v;
             farmHarvestEvent.exp *= v;
+        }
+
+    }
+
+    @EventHandler (ignoreCancelled = true,priority = EventPriority.MONITOR)
+    public void onFish(PlayerFishEvent playerFishEvent) {
+
+        Player player = playerFishEvent.getPlayer();
+
+        AbilityIntentionType.allPerks.forEach((s, skillPerk) -> skillPerk.onEvent(playerFishEvent, player));
+
+        if (playerFishEvent.getState() == PlayerFishEvent.State.CAUGHT_FISH) {
+
+            ItemStack itemStack = player.getInventory().getItemInMainHand();
+            if (EventListener.getAbilityIntentionType(itemStack) != AbilityIntentionType.FISHING) return;
+
+            playerFishEvent.setCancelled(true);
+
+            RewardsAPI.rewardPlayer(player,"fishing",1+PlayerDataHandler.getLevel(player,NonCombatStatType.FISHING)*0.5);
+
         }
 
     }

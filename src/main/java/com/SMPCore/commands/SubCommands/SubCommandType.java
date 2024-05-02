@@ -6,6 +6,7 @@ import com.SMPCore.Waypoints.CmdWaypoint;
 import com.SMPCore.Waypoints.SubCommands.CmdWaypointAdd;
 import com.SMPCore.Waypoints.SubCommands.CmdWaypointRemove;
 import com.SMPCore.Waypoints.SubCommands.CmdWaypointSet;
+import com.SMPCore.commands.CmdLootTable;
 
 import java.util.function.Supplier;
 
@@ -15,7 +16,11 @@ public enum SubCommandType {
 
     WAY_POINT_GIVE(CmdWaypoint.class, CmdWaypointAdd::new),
     WAY_POINT_ADD(CmdWaypoint.class, CmdWaypointRemove::new),
-    WAY_POINT_SET(CmdWaypoint.class, CmdWaypointSet::new)
+    WAY_POINT_SET(CmdWaypoint.class, CmdWaypointSet::new),
+
+    LOOT_MANAGER(CmdLootTable.class,SubCommandLootTableManager::new),
+    LOOT_UPDATER(CmdLootTable.class,SubCommandLootTableUpdater::new),
+    LOOT_EXECUTOR(CmdLootTable.class,SubCommandLootTableExecute::new)
 
     ;
 

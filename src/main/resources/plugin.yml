@@ -32,3 +32,10 @@ commands:
     usage: /ability
     aliases:
       - abilities
+  loottable:
+    usage: /loottable
+    aliases:
+      - lt
+      - ltable
+      - lootmanager
+      - lm

@@ -5,10 +5,7 @@ import com.SMPCore.Utilities.FlagRegistryConfig;
 import com.SMPCore.Utilities.TempEntityDataHandler;
 import com.SMPCore.Utilities.WorldGuardAPI;
 import com.SMPCore.Waypoints.WaypointListener;
-import com.SMPCore.commands.CmdAbility;
-import com.SMPCore.commands.CmdClaim;
-import com.SMPCore.commands.CmdSkills;
-import com.SMPCore.commands.CmdWarps;
+import com.SMPCore.commands.*;
 import com.SMPCore.configs.BlockDataConfig;
 import com.SMPCore.configs.CraftExpConfig;
 import com.SMPCore.listeners.CombineItemListener;
@@ -145,6 +142,7 @@ public class Main extends JavaPlugin {
         getCommand("skills").setExecutor(new CmdSkills());
         getCommand("warps").setExecutor(new CmdWarps());
         getCommand("ability").setExecutor(new CmdAbility());
+        getCommand("loottable").setExecutor(new CmdLootTable());
     }
 
     void registerListeners() {
