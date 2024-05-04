@@ -254,6 +254,9 @@ public class CombineItemListener implements Listener {
         int v = nbtItem.hasKey("combinePower") ? nbtItem.getInteger("combinePower") : 1;
         Rarity rarity = Rarity.getRarity(v);
         double a = 100+rarity.priority*10D;
+        nbtItem.setDouble("power",a);
+
+        itemStack = nbtItem.getItem();
 
         ItemMeta meta = itemStack.getItemMeta();
 

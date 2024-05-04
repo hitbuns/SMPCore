@@ -116,9 +116,12 @@ public class DurabilityListener implements Listener {
         EquipmentHandler.Material material = null;
 
         try {
-            material = EquipmentHandler.Material.valueOf(itemStack.getType().name().split("_")[0]);
+            material = EquipmentHandler.Material.valueOf(itemStack.getType().name().toUpperCase().split("_")[0]);
         } catch (Exception ignored) {
+            ignored.printStackTrace();
         }
+
+        System.out.println("material__"+(material != null ? material.name() : "NOT SET")+":::+++"+breakType.name());
 
         double multiplier = (1 + (breakType != BrokenBlockHandlerList.BrokenBlock.BreakType.NONE ? switch (material) {
             case WOODEN -> 0.5;
@@ -135,6 +138,12 @@ public class DurabilityListener implements Listener {
             NBTItem nbtItem = new NBTItem(itemStack);
             multiplier *= nbtItem.getDouble("power")/100;
 
+        }
+
+        if (breakType == BrokenBlockHandlerList.BrokenBlock.BreakType.SHOVEL) {
+            System.out.println("TEST_!@#2"+multiplier);
+            multiplier *= 15;
+            System.out.println("multi_"+multiplier);
         }
 
         brokenBlockHandlerList.getBrokenBlock(blockPosition).incrementDamage(player, multiplier*(1+0.2*(player.hasPotionEffect(
