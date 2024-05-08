@@ -14,8 +14,10 @@ import com.SMPCore.listeners.MobListener;
 import com.SMPCore.mining.DurabilityListener;
 import com.SMPCore.mobs.MobTicker;
 import com.SMPCore.skills.AbilityMessageConfig;
+import com.SMPCore.skills.ExpReason;
 import com.SMPCore.skills.PlayerDataHandler;
 import com.SMPCore.skills.SkillListener;
+import com.SMPCore.skills.impl.AbilityIntentionType;
 import com.SMPCore.skills.impl.CombatStatType;
 import com.SMPCore.skills.impl.NonCombatStatType;
 import com.earth2me.essentials.Essentials;
@@ -134,6 +136,42 @@ public class Main extends JavaPlugin {
 
         if (ExecutorLimitTask.scheduledExecutorService != null) ExecutorLimitTask
                 .scheduledExecutorService.shutdownNow();
+
+
+        getServer().getOnlinePlayers().forEach(player -> {
+
+            TempEntityDataHandler.EntityData entityData = TempEntityDataHandler.getorAdd(player);
+
+            for (NonCombatStatType a : NonCombatStatType.values()) {
+                double value = entityData.get("exp_next_tick_"+a.name(),
+                        Double.class,0D);
+
+                if (value > 0) {
+
+                    entityData.updateData("exp_next_tick_"+a.name(),Double.class,initial -> 0D,
+                            0D);
+                    PlayerDataHandler.addExp(player, a, ExpReason.GRIND,
+                            value);
+
+                }
+            }
+
+
+            for (CombatStatType a : CombatStatType.values()) {
+                double value = entityData.get("exp_next_tick_"+a.name(),
+                        Double.class,0D);
+
+                if (value > 0) {
+
+                    entityData.updateData("exp_next_tick_"+a.name(),Double.class,initial -> 0D,
+                            0D);
+                    PlayerDataHandler.addExp(player, a, ExpReason.GRIND,
+                            value);
+
+                }
+            }
+
+        });
 
     }
 

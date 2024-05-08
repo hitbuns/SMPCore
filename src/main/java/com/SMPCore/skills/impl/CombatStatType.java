@@ -10,11 +10,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum CombatStatType implements PlayerDataHandler.ExpId,iPerkContainer {
-
+//DONE
     STRENGTH("&cStrength"),
+    //DONE
     DEXTERITY("&aDexterity"),
+    //DONE
     CONSTITUTION("&dConstitution"),
+    //DONE
     AGILITY("&bAgility"),
+    //DONE
     DEFENSE("&eDefense")
     ;
 

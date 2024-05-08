@@ -9,6 +9,7 @@ import com.SMPCore.Utilities.TempEntityDataHandler;
 import com.SMPCore.configs.BlockDataConfig;
 import com.SMPCore.mining.CustomBlockBreakEvent;
 import com.SMPCore.skills.impl.AbilityIntentionType;
+import com.SMPCore.skills.impl.CombatStatType;
 import com.SMPCore.skills.impl.NonCombatStatType;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -17,7 +18,10 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -25,8 +29,101 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.FurnaceInventory;
+
+import java.util.concurrent.TimeUnit;
 
 public class SkillListener implements Listener {
+
+
+    @EventHandler (priority = EventPriority.MONITOR,ignoreCancelled = true)
+    public void cookExp(InventoryClickEvent inventoryClickEvent) {
+
+        if (inventoryClickEvent.isCancelled()) return;
+
+        if (inventoryClickEvent
+                .getWhoClicked() instanceof Player player
+                && inventoryClickEvent.getClickedInventory() instanceof FurnaceInventory furnaceInventory &&
+        inventoryClickEvent.getCurrentItem() == furnaceInventory.getResult() && !Utils.isNullorAir(inventoryClickEvent.getCurrentItem())) {
+
+
+
+        }
+
+
+    }
+
+    @EventHandler (priority = EventPriority.MONITOR,ignoreCancelled = true)
+    public void defenseExp(EntityDamageEvent entityDamageEvent) {
+
+        if (entityDamageEvent.isCancelled()) return;
+
+        if (entityDamageEvent.getEntity() instanceof Player player) {
+
+            double damage = entityDamageEvent.getDamage();
+            TempEntityDataHandler.getorAdd(player).updateData("exp_next_tick_"+ CombatStatType.DEFENSE.name(),
+                    Double.class,initial -> initial+switch (entityDamageEvent.getCause()) {
+                        case FALL -> 0.2*damage;
+                        case FIRE, FIRE_TICK -> 0.05*damage;
+                        case THORNS -> 0.25*damage;
+                        case ENTITY_ATTACK ->0.5*damage;
+                        case LAVA -> 0.1*damage;
+                        case PROJECTILE -> 0.75*damage;
+                        case POISON -> 0.17*damage;
+                        default -> 0;
+                    },0D);
+
+        }
+
+        if (entityDamageEvent instanceof EntityDamageByEntityEvent entityDamageByEntityEvent && Utils.getAttacker(entityDamageByEntityEvent
+                .getDamager()) instanceof Player player && entityDamageEvent.getEntity() instanceof LivingEntity
+        livingEntity) {
+            double finalDamage = entityDamageEvent
+                    .getFinalDamage();
+            Player v = livingEntity instanceof Player player1 ? player1 : null;
+
+            TempEntityDataHandler.EntityData entityData = TempEntityDataHandler.getorAdd(player);
+
+            if (livingEntity.getHealth() <= entityDamageEvent.getFinalDamage() && (v == null ||
+                    entityData.playerCooldownHandler.isOnCoolDown("last_deathkill_on_"+
+                            v.getName(), TimeUnit.MINUTES,2))) {
+                PlayerDataHandler.addExp(player, CombatStatType.CONSTITUTION, ExpReason.GRIND, livingEntity.getMaxHealth() * (v != null ? 5 : 0.5));
+            }
+
+            entityData.updateData("exp_next_tick_"+ (entityDamageByEntityEvent.getDamager() instanceof Projectile projectile && projectile instanceof Arrow &&
+                            projectile.getShooter() == player ? CombatStatType.DEXTERITY : CombatStatType
+                            .STRENGTH).name(),
+                    Double.class,initial -> initial+finalDamage*0.5,0D);
+
+
+
+
+        }
+
+    }
+
+    @EventHandler (priority = EventPriority.MONITOR,ignoreCancelled = true)
+    public void onMove(PlayerMoveEvent playerMoveEvent) {
+        Player player = playerMoveEvent.getPlayer();
+        if (playerMoveEvent.isCancelled() || !player.isSprinting()) return;
+
+        TempEntityDataHandler.EntityData entityData = TempEntityDataHandler.getorAdd(player);
+
+        if (!entityData.get("disable_sprint_gain_exp",
+                Boolean.class,false)) {
+
+            entityData.updateData("exp_next_tick_"+ CombatStatType.DEFENSE.name(),
+                    Double.class,initial -> initial+0.025,0D);
+
+        }
+
+
+    }
+
 
     @EventHandler (ignoreCancelled = true,priority = EventPriority.MONITOR)
     public void onPlace(BlockPlaceEvent blockPlaceEvent) {

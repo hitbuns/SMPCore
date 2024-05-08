@@ -14,8 +14,11 @@ import com.SMPCore.Utilities.TempEntityDataHandler;
 import com.SMPCore.configs.CraftExpConfig;
 import com.SMPCore.gui.WarpGUI;
 import com.SMPCore.skills.AbilitySkillPerk;
+import com.SMPCore.skills.ExpReason;
 import com.SMPCore.skills.PlayerDataHandler;
 import com.SMPCore.skills.impl.AbilityIntentionType;
+import com.SMPCore.skills.impl.CombatStatType;
+import com.SMPCore.skills.impl.NonCombatStatType;
 import com.SoundAnimation.SoundAPI;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -357,7 +360,42 @@ public class EventListener implements Listener {
 
         Collection<? extends Player> players = Bukkit.getOnlinePlayers();
 
-        players.forEach(player -> AbilityIntentionType.allPerks.forEach((s, skillPerk) -> skillPerk.onEvent(tickedSMPEvent, player)));
+        players.forEach(player -> {
+            AbilityIntentionType.allPerks.forEach((s, skillPerk) -> skillPerk.onEvent(tickedSMPEvent, player));
+
+            TempEntityDataHandler.EntityData entityData = TempEntityDataHandler.getorAdd(player);
+
+            for (NonCombatStatType a : NonCombatStatType.values()) {
+                double value = entityData.get("exp_next_tick_"+a.name(),
+                        Double.class,0D);
+
+                if (value > 0) {
+
+                    entityData.updateData("exp_next_tick_"+a.name(),Double.class,initial -> 0D,
+                            0D);
+                    PlayerDataHandler.addExp(player, a, ExpReason.GRIND,
+                            value);
+
+                }
+            }
+
+
+            for (CombatStatType a : CombatStatType.values()) {
+                double value = entityData.get("exp_next_tick_"+a.name(),
+                        Double.class,0D);
+
+                if (value > 0) {
+
+                    entityData.updateData("exp_next_tick_"+a.name(),Double.class,initial -> 0D,
+                            0D);
+                    PlayerDataHandler.addExp(player, a, ExpReason.GRIND,
+                            value);
+
+                }
+            }
+
+
+        });
 
         if (++c >= 7) {
             players.forEach(player -> {
